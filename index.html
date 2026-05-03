@@ -6,22 +6,20 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Barra lateral -->
-  <div class="sidebar">
-    <div class="menu">☰</div>
-    <div class="circle"></div>
-  </div>
+  <!-- Logo arriba a la izquierda -->
+  <header class="header">
+    <h1 class="logo">IsaroroBot</h1>
+  </header>
 
   <!-- Contenido principal -->
   <div class="main">
-    <h1 class="logo">Isaroro Bot</h1>
     <p class="intro">Hola, nombre<br>¿Por dónde empezamos?</p>
 
-    <!-- Caja de chat visible desde el inicio -->
+    <!-- Caja de chat -->
     <div class="chat-box" id="chatBox">
       <div class="messages" id="messages"></div>
       <div class="input-area">
-        <input id="userInput" type="text" placeholder="Escribe tu mensaje...">
+        <input id="userInput" type="text" placeholder="Pregúntale a IsaBot...">
         <button id="sendBtn">➤</button>
       </div>
     </div>
