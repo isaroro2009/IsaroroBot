@@ -1,23 +1,13 @@
-const API_URL = "https://api-inference.huggingface.co/models/DeepESP/gpt2-spanish";
-const API_TOKEN = "TU_TOKEN_AQUI"; // Reemplaza con tu token de Hugging Face
+const API_URL = "https://isa-bot-nine.vercel.app/api/chat";
 
-async function sendMessage() {
-  const input = document.getElementById("user-input").value;
-  const chatBox = document.getElementById("chat-box");
-
-  if (!input) return;
-
-  chatBox.innerHTML += `<p><b>Tú:</b> ${input}</p>`;
-
-  const response = await fetch(API_URL, {
-    method: "POST",
-    headers: { "Authorization": `Bearer ${API_TOKEN}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ inputs: "Responde en español: " + input })
-  });
-
+async function sendMessage(message) {
+  const response = await fetch(`${API_URL}?message=${encodeURIComponent(message)}`);
   const data = await response.json();
-  const botReply = data[0]?.generated_text || "Error al responder";
-
-  chatBox.innerHTML += `<p><b>Bot:</b> ${botReply}</p>`;
-  document.getElementById("user-input").value = "";
+  return data.reply;
 }
+
+document.getElementById("sendBtn").addEventListener("click", async () => {
+  const input = document.getElementById("userInput").value;
+  const reply = await sendMessage(input);
+  alert("Bot: " + reply);
+});
