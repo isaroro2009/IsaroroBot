@@ -1,44 +1,15 @@
-const API_URL = "https://isa-bot-nine.vercel.app/api/chat"; 
-// Cambia por tu backend en Vercel
+const HF_TOKEN = "TU_TOKEN_DE_HUGGINGFACE"; // aquí va tu token
+const API_URL = "https://api-inference.huggingface.co/models/DeepESP/gpt2-spanish";
 
-document.addEventListener("DOMContentLoaded", () => {
-  const askBtn = document.querySelector(".ask-btn");
-  const chatBox = document.getElementById("chatBox");
-
-  // Mostrar chat al presionar el botón
-  askBtn.addEventListener("click", () => {
-    chatBox.style.display = "flex";
+async function sendMessage(message) {
+  const response = await fetch(API_URL, {
+    headers: {
+      Authorization: `Bearer ${HF_TOKEN}`,
+      "Content-Type": "application/json",
+    },
+    method: "POST",
+    body: JSON.stringify({ inputs: message }),
   });
-
-  // Enviar mensaje
-  document.getElementById("sendBtn").addEventListener("click", async () => {
-    const input = document.getElementById("userInput").value;
-    if (!input) return;
-
-    const messagesDiv = document.getElementById("messages");
-
-    // Mensaje del usuario
-    const userMsg = document.createElement("div");
-    userMsg.className = "message user";
-    userMsg.textContent = input;
-    messagesDiv.appendChild(userMsg);
-
-    // Respuesta del bot
-    try {
-      const response = await fetch(`${API_URL}?message=${encodeURIComponent(input)}`);
-      const data = await response.json();
-      const botMsg = document.createElement("div");
-      botMsg.className = "message bot";
-      botMsg.textContent = data.reply;
-      messagesDiv.appendChild(botMsg);
-    } catch (error) {
-      const botMsg = document.createElement("div");
-      botMsg.className = "message bot";
-      botMsg.textContent = "Error al conectar con IsaBot 😔";
-      messagesDiv.appendChild(botMsg);
-    }
-
-    document.getElementById("userInput").value = "";
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-  });
-});
+  const data = await response.json();
+  return data[0]?.generated_text || "No pude responder 😔";
+}
