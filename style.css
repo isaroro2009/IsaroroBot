@@ -21,87 +21,43 @@ body {
   margin: 0;
 }
 
-/* Contenido principal */
+/* Texto central */
 .main {
   flex: 1;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
   color: white;
-}
-
-.intro {
-  font-size: 20px;
-  margin-bottom: 40px;
   text-align: center;
 }
 
-/* Caja de chat */
-.chat-box {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  max-width: 500px;
-  height: 400px;
-  background: white;
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-}
-
-.messages {
-  flex: 1;
-  padding: 15px;
-  overflow-y: auto;
-}
-
-.message {
-  margin: 10px 0;
-  padding: 10px 15px;
-  border-radius: 15px;
-  max-width: 70%;
-  word-wrap: break-word;
-}
-
-.user {
-  background: #d4a1f9;
-  align-self: flex-end;
-  color: white;
-}
-
-.bot {
-  background: #f1f1f1;
-  align-self: flex-start;
+.intro {
+  font-size: 22px;
+  line-height: 1.5;
 }
 
 /* Barra inferior degradada */
-.input-area {
+.footer {
+  width: 100%;
+  padding: 20px;
   display: flex;
-  align-items: center;
-  padding: 10px;
+  justify-content: center;
+}
+
+.ask-bar {
   background: linear-gradient(135deg, #a18cd1, #fbc2eb);
-}
-
-.placeholder {
-  color: white;
-  font-size: 16px;
-  margin-right: 10px;
-}
-
-.input-area input {
-  flex: 1;
   border: none;
-  padding: 10px;
-  border-radius: 10px;
-  outline: none;
-}
-
-.input-area button {
-  margin-left: 10px;
-  background: transparent;
-  border: none;
-  font-size: 20px;
+  padding: 15px 40px;
+  border-radius: 30px;
+  font-size: 18px;
   color: white;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.ask-bar:hover {
+  transform: scale(1.05);
 }
