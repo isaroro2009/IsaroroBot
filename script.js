@@ -1,14 +1,7 @@
-const HF_TOKEN = "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"; // pega tu token aquí
+const HF_TOKEN = "TU_TOKEN_DE_HUGGINGFACE"; // pega tu token aquí
 const API_URL = "https://api-inference.huggingface.co/models/DeepESP/gpt2-spanish";
 
 document.addEventListener("DOMContentLoaded", () => {
-  const askBtn = document.querySelector(".ask-btn");
-  const chatBox = document.getElementById("chatBox");
-
-  askBtn.addEventListener("click", () => {
-    chatBox.style.display = "flex";
-  });
-
   document.getElementById("sendBtn").addEventListener("click", async () => {
     const input = document.getElementById("userInput").value;
     if (!input) return;
