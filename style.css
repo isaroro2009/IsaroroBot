@@ -1,57 +1,65 @@
+/* Fondo degradado */
 body {
-  font-family: 'Poppins', sans-serif;
-  background: linear-gradient(135deg, #ff9a9e, #fad0c4);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
   margin: 0;
-}
-
-.chat-container {
-  background: white;
-  padding: 20px;
-  border-radius: 15px;
-  width: 400px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-}
-
-h1 {
-  text-align: center;
-  color: #ff6f91;
-}
-
-#chat-box {
-  background: #f7f7f7;
-  height: 300px;
-  overflow-y: auto;
-  margin-bottom: 15px;
-  padding: 10px;
-  border-radius: 10px;
-  border: 1px solid #ddd;
-}
-
-.input-area {
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #a18cd1, #fbc2eb, #cfd9df, #e2ebf0);
+  height: 100vh;
   display: flex;
-  gap: 10px;
+  align-items: center;
+  justify-content: center;
 }
 
-input {
-  flex: 1;
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
+/* Barra lateral */
+.sidebar {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
 }
 
-button {
-  background: #ff6f91;
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  border-radius: 8px;
+.menu {
+  font-size: 24px;
   cursor: pointer;
 }
 
-button:hover {
-  background: #ff3f6c;
+.circle {
+  width: 40px;
+  height: 40px;
+  background: white;
+  border-radius: 50%;
+}
+
+/* Contenido principal */
+.main {
+  text-align: center;
+  color: white;
+}
+
+.main h1 {
+  font-size: 28px;
+  margin-bottom: 20px;
+}
+
+.intro {
+  font-size: 20px;
+  margin-bottom: 40px;
+}
+
+/* Botón */
+.ask-btn {
+  background: linear-gradient(135deg, #a18cd1, #fbc2eb);
+  border: none;
+  padding: 15px 30px;
+  border-radius: 30px;
+  font-size: 18px;
+  color: white;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.ask-btn:hover {
+  transform: scale(1.05);
 }
