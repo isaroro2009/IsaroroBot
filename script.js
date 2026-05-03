@@ -1,4 +1,4 @@
-const HF_TOKEN = "TU_TOKEN_DE_HUGGINGFACE"; // aquí va tu token
+const HF_TOKEN = "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"; // aquí va tu token
 const API_URL = "https://api-inference.huggingface.co/models/DeepESP/gpt2-spanish";
 
 async function sendMessage(message) {
