@@ -25,6 +25,7 @@ body {
 .main {
   flex: 1;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   color: white;
@@ -34,6 +35,45 @@ body {
 .intro {
   font-size: 22px;
   line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+/* Caja de chat */
+.chat-box {
+  flex-direction: column;
+  width: 100%;
+  max-width: 500px;
+  height: 400px;
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  margin-top: 20px;
+}
+
+.messages {
+  flex: 1;
+  padding: 15px;
+  overflow-y: auto;
+}
+
+.message {
+  margin: 10px 0;
+  padding: 10px 15px;
+  border-radius: 15px;
+  max-width: 70%;
+  word-wrap: break-word;
+}
+
+.user {
+  background: #d4a1f9;
+  align-self: flex-end;
+  color: white;
+}
+
+.bot {
+  background: #f1f1f1;
+  align-self: flex-start;
 }
 
 /* Barra inferior degradada */
@@ -60,4 +100,28 @@ body {
 
 .ask-bar:hover {
   transform: scale(1.05);
+}
+
+.input-area {
+  display: flex;
+  padding: 10px;
+  background: #fafafa;
+}
+
+.input-area input {
+  flex: 1;
+  border: none;
+  padding: 10px;
+  border-radius: 10px;
+  outline: none;
+}
+
+.input-area button {
+  margin-left: 10px;
+  background: linear-gradient(135deg, #a18cd1, #fbc2eb);
+  border: none;
+  padding: 10px 15px;
+  border-radius: 10px;
+  color: white;
+  cursor: pointer;
 }
