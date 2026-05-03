@@ -3,20 +3,7 @@ const API_URL = "https://isa-bot-nine.vercel.app/api/chat";
 
 document.addEventListener("DOMContentLoaded", () => {
   const askBtn = document.querySelector(".ask-btn");
-  const main = document.querySelector(".main");
-
-  // Crear contenedor del chat
-  const chatBox = document.createElement("div");
-  chatBox.className = "chat-box";
-  chatBox.innerHTML = `
-    <div class="messages" id="messages"></div>
-    <div class="input-area">
-      <input id="userInput" type="text" placeholder="Escribe tu mensaje...">
-      <button id="sendBtn">Enviar</button>
-    </div>
-  `;
-  chatBox.style.display = "none"; // oculto al inicio
-  main.appendChild(chatBox);
+  const chatBox = document.getElementById("chatBox");
 
   // Mostrar chat al presionar el botón
   askBtn.addEventListener("click", () => {
