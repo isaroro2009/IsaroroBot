@@ -1,4 +1,4 @@
-const HF_TOKEN = "TU_TOKEN_DE_HUGGINGFACE"; 
+const HF_TOKEN = "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"; 
 const API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2";
 
 document.addEventListener("DOMContentLoaded", () => {
