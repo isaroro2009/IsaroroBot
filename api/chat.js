@@ -1,6 +1,11 @@
 export default async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ reply: "Método no permitido" });
+  }
+
   try {
-    const { message } = await req.json();
+    const body = await req.body; // 👈 usa req.body en Node.js clásico
+    const { message } = body;
 
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
@@ -14,14 +19,9 @@ export default async function handler(req, res) {
       })
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      return res.status(response.status).json({ reply: `Error: ${errorText}` });
-    }
-
     const data = await response.json();
-    res.status(200).json({ reply: data.choices?.[0]?.message?.content || "No pude responder 😔" });
+    return res.status(200).json({ reply: data.choices?.[0]?.message?.content || "No pude responder 😔" });
   } catch (error) {
-    res.status(500).json({ reply: "Error interno en el backend 😔" });
+    return res.status(500).json({ reply: "Error interno en el backend 😔", error: error.message });
   }
 }
