@@ -1,5 +1,5 @@
 export default async function handler(req, res) {
-  const { message } = await req.body;
+  const { message } = await req.json(); // 👈 importante
 
   const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
     method: "POST",
