@@ -1,5 +1,5 @@
-const HF_TOKEN = "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"; // pega tu token aquí
-const API_URL = "https://api-inference.huggingface.co/models/DeepESP/gpt2-spanish";
+const HF_TOKEN = "TU_TOKEN_DE_HUGGINGFACE"; 
+const API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2";
 
 document.addEventListener("DOMContentLoaded", () => {
   const sendBtn = document.getElementById("sendBtn");
@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await response.json();
       const botMsg = document.createElement("div");
       botMsg.className = "message bot";
-      botMsg.textContent = data[0]?.generated_text || "No pude responder 😔";
+      botMsg.textContent = data?.[0]?.generated_text || "No pude responder 😔";
       messagesDiv.appendChild(botMsg);
     } catch (error) {
       const botMsg = document.createElement("div");
