@@ -1,20 +1,11 @@
-const HF_TOKEN = "TU_TOKEN_DE_HUGGINGFACE"; // pega aquí tu token
+const HF_TOKEN = "TU_TOKEN_DE_HUGGINGFACE"; // pega tu token aquí
 const API_URL = "https://api-inference.huggingface.co/models/DeepESP/gpt2-spanish";
 
 document.addEventListener("DOMContentLoaded", () => {
-  const askBtn = document.querySelector(".ask-bar"); // barra inferior
-  const chatBox = document.getElementById("chatBox");
   const sendBtn = document.getElementById("sendBtn");
   const userInput = document.getElementById("userInput");
   const messagesDiv = document.getElementById("messages");
 
-  // Mostrar la caja de chat al hacer clic en la barra inferior
-  askBtn.addEventListener("click", () => {
-    chatBox.style.display = "flex";
-    askBtn.style.display = "none"; // ocultamos la barra para que quede solo el chat
-  });
-
-  // Función para enviar mensaje
   async function sendMessage() {
     const input = userInput.value.trim();
     if (!input) return;
@@ -53,10 +44,8 @@ document.addEventListener("DOMContentLoaded", () => {
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
   }
 
-  // Evento al hacer clic en enviar
   sendBtn.addEventListener("click", sendMessage);
 
-  // Permitir enviar con Enter
   userInput.addEventListener("keypress", (e) => {
     if (e.key === "Enter") {
       sendMessage();
