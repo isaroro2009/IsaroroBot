@@ -5,15 +5,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const sendBtn = document.getElementById("sendBtn");
   const userInput = document.getElementById("userInput");
   const messagesDiv = document.getElementById("messages");
+  const fileInput = document.getElementById("fileInput");
 
-  async function sendMessage() {
-    const input = userInput.value.trim();
-    if (!input) return;
+  async function sendMessage(text) {
+    if (!text) return;
 
     // Mensaje del usuario
     const userMsg = document.createElement("div");
     userMsg.className = "message user";
-    userMsg.textContent = input;
+    userMsg.textContent = text;
     messagesDiv.appendChild(userMsg);
 
     // Respuesta del bot con IA real
@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
           "Content-Type": "application/json",
         },
         method: "POST",
-        body: JSON.stringify({ inputs: input }),
+        body: JSON.stringify({ inputs: text }),
       });
 
       const data = await response.json();
@@ -39,16 +39,26 @@ document.addEventListener("DOMContentLoaded", () => {
       messagesDiv.appendChild(botMsg);
     }
 
-    // limpiar input y hacer scroll
     userInput.value = "";
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
   }
 
-  sendBtn.addEventListener("click", sendMessage);
+  sendBtn.addEventListener("click", () => sendMessage(userInput.value.trim()));
 
   userInput.addEventListener("keypress", (e) => {
     if (e.key === "Enter") {
-      sendMessage();
+      sendMessage(userInput.value.trim());
+    }
+  });
+
+  // Funcionalidad del botón ➕
+  fileInput.addEventListener("change", () => {
+    const file = fileInput.files[0];
+    if (file) {
+      const fileMsg = document.createElement("div");
+      fileMsg.className = "message user";
+      fileMsg.textContent = `📎 Archivo: ${file.name}`;
+      messagesDiv.appendChild(fileMsg);
     }
   });
 });
