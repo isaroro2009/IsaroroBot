@@ -4,7 +4,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { message } = req.body;
+    const { message } = req.body; // ✅ en Next.js se usa req.body
 
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
