@@ -27,7 +27,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   color: white;
   text-align: center;
 }
@@ -38,25 +38,19 @@ body {
   margin-bottom: 20px;
 }
 
-/* Caja de chat */
-.chat-box {
-  flex-direction: column;
-  width: 100%;
-  max-width: 500px;
-  height: 400px;
-  background: white;
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-  margin-top: 20px;
-}
-
+/* Área de mensajes */
 .messages {
   flex: 1;
+  width: 100%;
+  max-width: 500px;
+  background: white;
+  border-radius: 20px;
   padding: 15px;
   overflow-y: auto;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
 }
 
+/* Mensajes */
 .message {
   margin: 10px 0;
   padding: 10px 15px;
@@ -77,11 +71,21 @@ body {
 }
 
 /* Barra inferior colorida */
+.footer {
+  width: 100%;
+  padding: 15px;
+  display: flex;
+  justify-content: center;
+}
+
 .input-area {
   display: flex;
   align-items: center;
+  width: 100%;
+  max-width: 500px;
   padding: 10px;
   background: linear-gradient(135deg, #a18cd1, #fbc2eb);
+  border-radius: 30px;
 }
 
 .attach-btn {
