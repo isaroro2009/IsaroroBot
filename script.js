@@ -1,11 +1,10 @@
-const HF_TOKEN = "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"; 
-const API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2";
+const OR_TOKEN = "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"; 
+const API_URL = "https://openrouter.ai/api/v1/chat/completions";
 
 document.addEventListener("DOMContentLoaded", () => {
   const sendBtn = document.getElementById("sendBtn");
   const userInput = document.getElementById("userInput");
   const messagesDiv = document.getElementById("messages");
-  const fileInput = document.getElementById("fileInput");
 
   async function sendMessage(text) {
     if (!text) return;
@@ -16,26 +15,28 @@ document.addEventListener("DOMContentLoaded", () => {
     userMsg.textContent = text;
     messagesDiv.appendChild(userMsg);
 
-    // Respuesta del bot con IA real
     try {
       const response = await fetch(API_URL, {
-        headers: {
-          Authorization: `Bearer ${HF_TOKEN}`,
-          "Content-Type": "application/json",
-        },
         method: "POST",
-        body: JSON.stringify({ inputs: text }),
+        headers: {
+          "Authorization": `Bearer ${OR_TOKEN}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: "mistralai/mistral-7b-instruct", // puedes cambiar el modelo
+          messages: [{ role: "user", content: text }]
+        })
       });
 
       const data = await response.json();
       const botMsg = document.createElement("div");
       botMsg.className = "message bot";
-      botMsg.textContent = data?.[0]?.generated_text || "No pude responder 😔";
+      botMsg.textContent = data.choices?.[0]?.message?.content || "No pude responder 😔";
       messagesDiv.appendChild(botMsg);
     } catch (error) {
       const botMsg = document.createElement("div");
       botMsg.className = "message bot";
-      botMsg.textContent = "Error al conectar con Hugging Face 😔";
+      botMsg.textContent = "Error al conectar con OpenRouter 😔";
       messagesDiv.appendChild(botMsg);
     }
 
@@ -44,21 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   sendBtn.addEventListener("click", () => sendMessage(userInput.value.trim()));
-
   userInput.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") {
-      sendMessage(userInput.value.trim());
-    }
-  });
-
-  // Funcionalidad del botón ➕
-  fileInput.addEventListener("change", () => {
-    const file = fileInput.files[0];
-    if (file) {
-      const fileMsg = document.createElement("div");
-      fileMsg.className = "message user";
-      fileMsg.textContent = `📎 Archivo: ${file.name}`;
-      messagesDiv.appendChild(fileMsg);
-    }
+    if (e.key === "Enter") sendMessage(userInput.value.trim());
   });
 });
