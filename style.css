@@ -77,35 +77,20 @@ body {
 }
 
 /* Barra inferior degradada */
-.footer {
-  width: 100%;
-  padding: 20px;
-  display: flex;
-  justify-content: center;
-}
-
-.ask-bar {
-  background: linear-gradient(135deg, #a18cd1, #fbc2eb);
-  border: none;
-  padding: 15px 40px;
-  border-radius: 30px;
-  font-size: 18px;
-  color: white;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-}
-
-.ask-bar:hover {
-  transform: scale(1.05);
-}
-
 .input-area {
   display: flex;
+  align-items: center;
   padding: 10px;
-  background: #fafafa;
+  background: linear-gradient(135deg, #a18cd1, #fbc2eb);
+}
+
+.attach-btn {
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  color: white;
+  cursor: pointer;
+  margin-right: 10px;
 }
 
 .input-area input {
@@ -118,10 +103,9 @@ body {
 
 .input-area button {
   margin-left: 10px;
-  background: linear-gradient(135deg, #a18cd1, #fbc2eb);
+  background: transparent;
   border: none;
-  padding: 10px 15px;
-  border-radius: 10px;
+  font-size: 20px;
   color: white;
   cursor: pointer;
 }
