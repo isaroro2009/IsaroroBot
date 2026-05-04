@@ -43,34 +43,31 @@ body {
   flex: 1;
   width: 100%;
   max-width: 500px;
-  background: white;
-  border-radius: 20px;
   padding: 15px;
   overflow-y: auto;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
 }
 
-/* Mensajes */
+/* Burbujas degradadas */
 .message {
   margin: 10px 0;
   padding: 10px 15px;
-  border-radius: 15px;
+  border-radius: 20px;
   max-width: 70%;
   word-wrap: break-word;
-}
-
-.user {
-  background: #d4a1f9;
-  align-self: flex-end;
   color: white;
 }
 
+.user {
+  background: linear-gradient(135deg, #a18cd1, #fbc2eb);
+  align-self: flex-end;
+}
+
 .bot {
-  background: #f1f1f1;
+  background: linear-gradient(135deg, #fbc2eb, #a18cd1);
   align-self: flex-start;
 }
 
-/* Barra inferior colorida */
+/* Barra inferior degradada */
 .footer {
   width: 100%;
   padding: 15px;
@@ -89,20 +86,20 @@ body {
 }
 
 .attach-btn {
-  background: transparent;
-  border: none;
   font-size: 20px;
   color: white;
   cursor: pointer;
   margin-right: 10px;
 }
 
-.input-area input {
+.input-area input[type="text"] {
   flex: 1;
   border: none;
   padding: 10px;
   border-radius: 10px;
   outline: none;
+  background: transparent;
+  color: white;
 }
 
 .input-area button {
