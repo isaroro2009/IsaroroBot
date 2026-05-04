@@ -4,7 +4,8 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { message } = req.body; // ✅ en Next.js se usa req.body
+    // ✅ En Next.js se usa req.body
+    const { message } = req.body;
 
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
@@ -19,8 +20,13 @@ export default async function handler(req, res) {
     });
 
     const data = await response.json();
-    return res.status(200).json({ reply: data.choices?.[0]?.message?.content || "No pude responder 😔" });
+    return res.status(200).json({
+      reply: data.choices?.[0]?.message?.content || "No pude responder 😔"
+    });
   } catch (error) {
-    return res.status(500).json({ reply: "Error interno en el backend 😔", error: error.message });
+    return res.status(500).json({
+      reply: "Error interno en el backend 😔",
+      error: error.message
+    });
   }
 }
