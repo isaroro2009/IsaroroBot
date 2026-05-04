@@ -1,5 +1,5 @@
 const OR_TOKEN = "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"; 
-const API_URL = "https://openrouter.ai/api/v1/chat/completions";
+const API_URL = "https://isaroro-feygpe562-isarorostudio-7594s-projects.vercel.app/api/chat";
 
 document.addEventListener("DOMContentLoaded", () => {
   const sendBtn = document.getElementById("sendBtn");
