@@ -26,14 +26,30 @@ body {
   text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
 }
 
-/* Área de mensajes */
-.messages {
+/* Texto central */
+.main {
   flex: 1;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.intro {
+  font-size: 1.2em;
+  text-align: center;
+  color: #fff;
+  margin-bottom: 20px;
+}
+
+/* Área de mensajes */
+.messages {
+  width: 90%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
   gap: 10px;
-  padding: 15px;
   overflow-y: auto;
+  max-height: 50vh;
 }
 
 /* Burbuja IsaBot */
@@ -44,7 +60,7 @@ body {
   border-radius: 20px 20px 20px 5px;
   max-width: 80%;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  animation: popIn 0.3s ease;
+  animation: floatBubble 2s ease infinite alternate;
 }
 
 /* Burbuja usuario */
@@ -55,13 +71,13 @@ body {
   border-radius: 20px 20px 5px 20px;
   max-width: 80%;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  animation: popIn 0.3s ease;
+  animation: floatBubble 2s ease infinite alternate;
 }
 
-/* Animación burbujas */
-@keyframes popIn {
-  from { transform: scale(0.8); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+/* Animación burbujas flotantes */
+@keyframes floatBubble {
+  from { transform: translateY(0px); }
+  to { transform: translateY(-5px); }
 }
 
 /* Barra inferior */
@@ -101,6 +117,9 @@ body {
 
 /* Responsive */
 @media (max-width: 600px) {
+  .messages {
+    max-height: 40vh;
+  }
   .input-area button {
     width: 35px;
     height: 35px;
