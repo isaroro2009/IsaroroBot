@@ -57,11 +57,12 @@ body {
 /* Burbuja IsaBot */
 .bot {
   align-self: flex-start;
-  background: linear-gradient(135deg, #e3c8ff, #c8e7ff);
+  background: linear-gradient(135deg, #c8e7ff, #e3c8ff);
   padding: 18px;
-  border-radius: 25px;
-  width: 100%;
-  color: #4a4a4a;
+  border-radius: 25px 25px 25px 5px;
+  width: fit-content;
+  max-width: 85%;
+  color: #333;
   font-size: 1.1em;
   font-weight: 500;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
@@ -73,9 +74,10 @@ body {
   align-self: flex-end;
   background: linear-gradient(135deg, #ffd6eb, #ffc8d6);
   padding: 18px;
-  border-radius: 25px;
-  width: 100%;
-  color: #4a4a4a;
+  border-radius: 25px 25px 5px 25px;
+  width: fit-content;
+  max-width: 85%;
+  color: #333;
   font-size: 1.1em;
   font-weight: 500;
   text-align: right;
