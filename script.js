@@ -1,43 +1,26 @@
-const API_URL = "https://isaroro-feygpe562-isarorostudio-7594s-projects.vercel.app/api/chat";
+const sendBtn = document.getElementById("sendBtn");
+const userInput = document.getElementById("userInput");
+const messages = document.getElementById("messages");
 
-document.addEventListener("DOMContentLoaded", () => {
-  const sendBtn = document.getElementById("sendBtn");
-  const userInput = document.getElementById("userInput");
-  const messagesDiv = document.getElementById("messages");
+sendBtn.addEventListener("click", () => {
+  const text = userInput.value.trim();
+  if (text !== "") {
+    // Crear burbuja de usuario
+    const userBubble = document.createElement("div");
+    userBubble.className = "user";
+    userBubble.textContent = text;
+    messages.appendChild(userBubble);
 
-  async function sendMessage(text) {
-    if (!text) return;
-
-    const userMsg = document.createElement("div");
-    userMsg.className = "message user";
-    userMsg.textContent = text;
-    messagesDiv.appendChild(userMsg);
-
-    try {
-      const response = await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text })
-      });
-
-      const data = await response.json();
-      const botMsg = document.createElement("div");
-      botMsg.className = "message bot";
-      botMsg.textContent = data.reply;
-      messagesDiv.appendChild(botMsg);
-    } catch (error) {
-      const botMsg = document.createElement("div");
-      botMsg.className = "message bot";
-      botMsg.textContent = "Error al conectar con el backend 😔";
-      messagesDiv.appendChild(botMsg);
-    }
+    // Simular respuesta kawaii de IsaBot
+    setTimeout(() => {
+      const botBubble = document.createElement("div");
+      botBubble.className = "bot";
+      botBubble.textContent = "IsaBot 💕 dice: " + text + " 🌸✨";
+      messages.appendChild(botBubble);
+      messages.scrollTop = messages.scrollHeight;
+    }, 600);
 
     userInput.value = "";
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    messages.scrollTop = messages.scrollHeight;
   }
-
-  sendBtn.addEventListener("click", () => sendMessage(userInput.value.trim()));
-  userInput.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") sendMessage(userInput.value.trim());
-  });
 });
