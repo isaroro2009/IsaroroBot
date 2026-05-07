@@ -1,14 +1,70 @@
+/* 🌈 Fondo degradado infinito kawaii */
+body {
+  margin: 0;
+  font-family: 'Nunito', sans-serif;
+  background: linear-gradient(270deg, #ffd6eb, #e3c8ff, #c8e7ff);
+  background-size: 600% 600%;
+  animation: gradientMove 15s ease infinite;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Logo */
+.header {
+  padding: 10px 20px;
+}
+.logo {
+  font-size: 1.8em;
+  color: #fff;
+  font-weight: 700;
+  text-shadow: 2px 2px 6px rgba(0,0,0,0.2);
+}
+
+/* Texto central */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.intro {
+  font-size: 1.3em;
+  text-align: center;
+  color: #fff;
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+
+/* Área de mensajes */
+.messages {
+  width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  padding: 15px;
+}
+
 /* Burbuja IsaBot */
 .bot {
   align-self: flex-start;
   background: linear-gradient(135deg, #e3c8ff, #c8e7ff);
-  padding: 20px;
+  padding: 18px;
   border-radius: 25px;
   width: 100%;
   color: #4a4a4a;
   font-size: 1.1em;
   font-weight: 500;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   animation: floatBubble 2s ease infinite alternate;
 }
 
@@ -16,14 +72,14 @@
 .user {
   align-self: flex-end;
   background: linear-gradient(135deg, #ffd6eb, #ffc8d6);
-  padding: 20px;
+  padding: 18px;
   border-radius: 25px;
   width: 100%;
   color: #4a4a4a;
   font-size: 1.1em;
   font-weight: 500;
-  text-align: right; /* ✅ texto alineado a la derecha */
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  text-align: right;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   animation: floatBubble 2s ease infinite alternate;
 }
 
@@ -31,4 +87,53 @@
 @keyframes floatBubble {
   from { transform: translateY(0px); }
   to { transform: translateY(-8px); }
+}
+
+/* Barra inferior */
+.footer {
+  padding: 10px;
+}
+.input-area {
+  display: flex;
+  align-items: center;
+  background: rgba(255,255,255,0.85);
+  border-radius: 30px;
+  padding: 10px 15px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.input-area input[type="text"] {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 1.1em;
+  outline: none;
+  color: #555;
+}
+.input-area button {
+  background: linear-gradient(135deg, #c8e7ff, #ffd6eb);
+  border: none;
+  border-radius: 50%;
+  width: 42px;
+  height: 42px;
+  cursor: pointer;
+  font-size: 1.2em;
+  color: #555;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease;
+}
+.input-area button:hover {
+  transform: scale(1.1);
+}
+.attach-btn {
+  margin-right: 10px;
+  cursor: pointer;
+  font-size: 1.3em;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .input-area button {
+    width: 36px;
+    height: 36px;
+  }
 }
