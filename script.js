@@ -1,7 +1,9 @@
+// Importar Firebase v12 (modular)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, doc, getDoc, getDocs, query, where, updateDoc, deleteDoc, orderBy } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
 
+// ⚠️ Usa exactamente los valores que te da Firebase Console en "Configuración del proyecto > Tus apps"
 const firebaseConfig = {
   apiKey: "AIzaSyBNTRiC07IkOAegZnedJz7o0lUlxa-wVBo",
   authDomain: "isabot-a234a.firebaseapp.com",
@@ -12,6 +14,7 @@ const firebaseConfig = {
   measurementId: "G-SF1LDNL6BF"
 };
 
+// Inicializar Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -30,6 +33,8 @@ const sendBtn = document.getElementById("sendBtn");
 const userInput = document.getElementById("userInput");
 const menuBtn = document.getElementById("menuBtn");
 const sidebar = document.getElementById("sidebar");
+const authContainer = document.getElementById("authContainer");
+const chatContainer = document.getElementById("chatContainer");
 
 let currentChatId = null;
 
@@ -52,6 +57,8 @@ loginBtn.addEventListener("click", async () => {
     const userCredential = await signInWithEmailAndPassword(auth, email.value, password.value);
     const user = userCredential.user;
     userFooter.textContent = "👤 " + username.value + " 💕";
+    authContainer.style.display = "none";
+    chatContainer.style.display = "flex";
     loadChats(user.uid);
     alert("Bienvenido 🌸");
   } catch (error) {
@@ -78,12 +85,12 @@ newChatBtn.addEventListener("click", async () => {
 
 async function loadChats(uid) {
   chatList.innerHTML = "";
-  const q = query(collection(db, "chats"), where("userId", "==", uid), orderBy("createdAt", "desc"));
+  const q = query(collection(db, "chats"), where("userId", "==", uid), orderBy("pinned", "desc"), orderBy("createdAt", "desc"));
   const snapshot = await getDocs(q);
   snapshot.forEach(docSnap => {
     const data = docSnap.data();
     const li = document.createElement("li");
-    li.textContent = "Chat " + docSnap.id + " (" + new Date(data.createdAt.seconds * 1000).toLocaleString() + ")";
+    li.textContent = "Chat " + docSnap.id + " (" + new Date(data.createdAt).toLocaleString() + ")";
     if (data.pinned) li.classList.add("pinned");
 
     // Acciones
@@ -137,9 +144,12 @@ async function sendMessage() {
     userBubble.textContent = text;
     messages.appendChild(userBubble);
 
-    await updateDoc(doc(db, "chats", currentChatId), {
-      messages: firebase.firestore.FieldValue.arrayUnion({ sender: "user", text })
-    });
+    const chatRef = doc(db, "chats", currentChatId);
+    const docSnap = await getDoc(chatRef);
+    const data = docSnap.data();
+    const updatedMessages = [...data.messages, { sender: "user", text }];
+
+    await updateDoc(chatRef, { messages: updatedMessages });
 
     setTimeout(async () => {
       const botText = "IsaBot 💕 dice: " + text + " 🌸✨";
@@ -148,31 +158,5 @@ async function sendMessage() {
       botBubble.textContent = botText;
       messages.appendChild(botBubble);
 
-      await updateDoc(doc(db, "chats", currentChatId), {
-        messages: firebase.firestore.FieldValue.arrayUnion({ sender: "bot", text: botText })
-      });
-
-      messages.scrollTop = messages.scrollHeight;
-    }, 600);
-
-    userInput.value = "";
-    messages.scrollTop = messages.scrollHeight;
-  }
-}
-
-sendBtn.addEventListener("click", sendMessage);
-userInput.addEventListener("keypress", (event) => {
-  if (event.key === "Enter") {
-    event.preventDefault();
-    sendMessage();
-  }
-});
-
-// ----------------------
-// 📂 Menú lateral toggle
-// ----------------------
-menuBtn.addEventListener("click", () => {
-  sidebar.classList.toggle("open");
-  const user = auth.currentUser;
-  if (user) loadChats(user.uid);
-});
+      const newMessages = [...updatedMessages, { sender: "bot", text: botText }];
+      await updateDoc(chatRef, { messages
