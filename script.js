@@ -1,3 +1,19 @@
+// Configuración Firebase (copiar la tuya desde Firebase Console)
+const firebaseConfig = {
+  apiKey: "TU_API_KEY",
+  authDomain: "TU_PROJECT.firebaseapp.com",
+  projectId: "TU_PROJECT_ID",
+  storageBucket: "TU_PROJECT.appspot.com",
+  messagingSenderId: "TU_SENDER_ID",
+  appId: "TU_APP_ID"
+};
+
+// Inicializar Firebase
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+// Elementos
 const sendBtn = document.getElementById("sendBtn");
 const userInput = document.getElementById("userInput");
 const messages = document.getElementById("messages");
@@ -5,29 +21,130 @@ const menuBtn = document.getElementById("menuBtn");
 const sidebar = document.getElementById("sidebar");
 const chatList = document.getElementById("chatList");
 const newChatBtn = document.getElementById("newChatBtn");
+const registerBtn = document.getElementById("registerBtn");
+const loginBtn = document.getElementById("loginBtn");
+const email = document.getElementById("email");
+const password = document.getElementById("password");
+const username = document.getElementById("username");
+const userFooter = document.getElementById("userFooter");
 
-// Función para enviar mensajes
+let currentChatId = null;
+
+// ----------------------
+// 🔐 Registro/Login
+// ----------------------
+registerBtn.addEventListener("click", () => {
+  auth.createUserWithEmailAndPassword(email.value, password.value)
+    .then(userCredential => {
+      const user = userCredential.user;
+      db.collection("users").doc(user.uid).set({ name: username.value });
+      alert("Usuario registrado 💕");
+    })
+    .catch(error => alert(error.message));
+});
+
+loginBtn.addEventListener("click", () => {
+  auth.signInWithEmailAndPassword(email.value, password.value)
+    .then(userCredential => {
+      const user = userCredential.user;
+      db.collection("users").doc(user.uid).get().then(doc => {
+        if (doc.exists) {
+          userFooter.textContent = "👤 " + doc.data().name + " 💕";
+        }
+      });
+      loadChats();
+      alert("Bienvenido 🌸");
+    })
+    .catch(error => alert(error.message));
+});
+
+// ----------------------
+// 💬 Chats privados
+// ----------------------
+newChatBtn.addEventListener("click", () => {
+  const user = auth.currentUser;
+  if (!user) return alert("Debes iniciar sesión 💕");
+
+  db.collection("chats").add({
+    userId: user.uid,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    messages: []
+  }).then(() => {
+    alert("Chat creado 🌸✨");
+    loadChats();
+  });
+});
+
+function loadChats() {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  db.collection("chats").where("userId", "==", user.uid).get()
+    .then(snapshot => {
+      chatList.innerHTML = "";
+      snapshot.forEach(doc => {
+        const li = document.createElement("li");
+        li.textContent = "Chat " + doc.id;
+        li.addEventListener("click", () => openChat(doc.id));
+        chatList.appendChild(li);
+
+        // Botón eliminar
+        const delBtn = document.createElement("button");
+        delBtn.textContent = "🗑️";
+        delBtn.style.marginLeft = "10px";
+        delBtn.addEventListener("click", () => deleteChat(doc.id));
+        li.appendChild(delBtn);
+      });
+    });
+}
+
+function openChat(chatId) {
+  currentChatId = chatId;
+  messages.innerHTML = "";
+  db.collection("chats").doc(chatId).get().then(doc => {
+    const data = doc.data();
+    data.messages.forEach(msg => {
+      const bubble = document.createElement("div");
+      bubble.className = msg.sender;
+      bubble.textContent = msg.text;
+      messages.appendChild(bubble);
+    });
+  });
+}
+
+function deleteChat(chatId) {
+  db.collection("chats").doc(chatId).delete().then(() => {
+    alert("Chat eliminado 🗑️");
+    loadChats();
+  });
+}
+
+// ----------------------
+// 📩 Mensajes
+// ----------------------
 function sendMessage() {
   const text = userInput.value.trim();
-  if (text !== "") {
-    // Crear burbuja de usuario
+  if (text !== "" && currentChatId) {
     const userBubble = document.createElement("div");
     userBubble.className = "user";
     userBubble.textContent = text;
     messages.appendChild(userBubble);
 
-    // Guardar mensaje en el chat actual
-    saveMessage("user", text);
+    // Guardar mensaje en Firestore
+    db.collection("chats").doc(currentChatId).update({
+      messages: firebase.firestore.FieldValue.arrayUnion({ sender: "user", text })
+    });
 
-    // Simular respuesta kawaii de IsaBot
     setTimeout(() => {
+      const botText = "IsaBot 💕 dice: " + text + " 🌸✨";
       const botBubble = document.createElement("div");
       botBubble.className = "bot";
-      botBubble.textContent = "IsaBot 💕 dice: " + text + " 🌸✨";
+      botBubble.textContent = botText;
       messages.appendChild(botBubble);
 
-      // Guardar respuesta en el chat actual
-      saveMessage("bot", botBubble.textContent);
+      db.collection("chats").doc(currentChatId).update({
+        messages: firebase.firestore.FieldValue.arrayUnion({ sender: "bot", text: botText })
+      });
 
       messages.scrollTop = messages.scrollHeight;
     }, 600);
@@ -37,10 +154,7 @@ function sendMessage() {
   }
 }
 
-// Click en botón
 sendBtn.addEventListener("click", sendMessage);
-
-// Enter en teclado
 userInput.addEventListener("keypress", (event) => {
   if (event.key === "Enter") {
     event.preventDefault();
@@ -49,62 +163,9 @@ userInput.addEventListener("keypress", (event) => {
 });
 
 // ----------------------
-// 📂 Gestión de chats
+// 📂 Menú lateral toggle
 // ----------------------
-let currentChatId = null;
-
-// Abrir/cerrar menú lateral
 menuBtn.addEventListener("click", () => {
   sidebar.classList.toggle("open");
   loadChats();
 });
-
-// Crear nuevo chat
-newChatBtn.addEventListener("click", () => {
-  const chatId = "chat_" + Date.now();
-  localStorage.setItem(chatId, JSON.stringify([])); // chat vacío
-  currentChatId = chatId;
-  loadChats();
-  messages.innerHTML = ""; // limpiar área de mensajes
-});
-
-// Guardar mensaje en el chat actual
-function saveMessage(sender, text) {
-  if (!currentChatId) {
-    // Si no hay chat activo, crear uno nuevo
-    currentChatId = "chat_" + Date.now();
-    localStorage.setItem(currentChatId, JSON.stringify([]));
-    loadChats();
-  }
-  const chatData = JSON.parse(localStorage.getItem(currentChatId)) || [];
-  chatData.push({ sender, text });
-  localStorage.setItem(currentChatId, JSON.stringify(chatData));
-}
-
-// Cargar lista de chats en el menú
-function loadChats() {
-  chatList.innerHTML = "";
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    if (key.startsWith("chat_")) {
-      const li = document.createElement("li");
-      li.textContent = key.replace("chat_", "Chat ");
-      li.addEventListener("click", () => openChat(key));
-      chatList.appendChild(li);
-    }
-  }
-}
-
-// Abrir un chat guardado
-function openChat(chatId) {
-  currentChatId = chatId;
-  messages.innerHTML = "";
-  const chatData = JSON.parse(localStorage.getItem(chatId)) || [];
-  chatData.forEach(msg => {
-    const bubble = document.createElement("div");
-    bubble.className = msg.sender;
-    bubble.textContent = msg.text;
-    messages.appendChild(bubble);
-  });
-  messages.scrollTop = messages.scrollHeight;
-}
