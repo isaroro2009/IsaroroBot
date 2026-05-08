@@ -1,20 +1,17 @@
-// Importar Firebase v12 (modular)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, doc, getDoc, getDocs, query, where, updateDoc, deleteDoc, orderBy } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
 
-// Tu configuración de Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyBNTRiC07IkOAegZnedJz7o0lUlxa-wVBo",
   authDomain: "isabot-a234a.firebaseapp.com",
   projectId: "isabot-a234a",
-  storageBucket: "isabot-a234a.appspot.com",   // ✅ ojo aquí
+  storageBucket: "isabot-a234a.appspot.com", // ✅ corregido
   messagingSenderId: "559355649312",
   appId: "1:559355649312:web:e509ae34c769479ca58b45",
   measurementId: "G-SF1LDNL6BF"
 };
 
-// Inicializar Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
