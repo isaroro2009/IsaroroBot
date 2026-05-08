@@ -8,7 +8,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyBNTRiC07IkOAegZnedJz7o0lUlxa-wVBo",
   authDomain: "isabot-a234a.firebaseapp.com",
   projectId: "isabot-a234a",
-  storageBucket: "isabot-a234a.firebasestorage.app",
+  storageBucket: "isabot-a234a.appspot.com",   // ✅ ojo aquí
   messagingSenderId: "559355649312",
   appId: "1:559355649312:web:e509ae34c769479ca58b45",
   measurementId: "G-SF1LDNL6BF"
