@@ -1,4 +1,4 @@
-/* 🌈 Fondo degradado infinito kawaii */
+/* Fondo kawaii pastel */
 body {
   margin: 0;
   font-family: 'Nunito', sans-serif;
@@ -6,6 +6,7 @@ body {
   background-size: 600% 600%;
   animation: gradientMove 15s ease infinite;
   height: 100vh;
+  display: flex;
 }
 
 @keyframes gradientMove {
@@ -14,48 +15,12 @@ body {
   100% { background-position: 0% 50%; }
 }
 
-/* Formulario de registro/login */
-.auth-container {
-  max-width: 350px;
-  margin: 40px auto;
-  background: rgba(255,255,255,0.95);
-  border-radius: 20px;
-  padding: 25px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  text-align: center;
-}
-
-.auth-container h2 {
-  font-size: 1.5em;
-  color: #555;
-  margin-bottom: 20px;
-}
-
-.auth-container input {
-  width: 100%;
-  padding: 12px;
-  margin: 8px 0;
-  border-radius: 12px;
-  border: 1px solid #ddd;
-  font-size: 1em;
-  outline: none;
-}
-
-.auth-container button {
-  width: 48%;
-  margin: 8px 1%;
-  padding: 12px;
-  border: none;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #ffd6eb, #c8e7ff);
-  font-size: 1em;
-  cursor: pointer;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-  transition: transform 0.2s ease;
-}
-
-.auth-container button:hover {
-  transform: scale(1.05);
+/* Contenedor principal */
+.chat-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
 }
 
 /* Botón menú */
@@ -87,7 +52,7 @@ body {
   padding: 20px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
   z-index: 1000;
 }
 .sidebar.open { left: 0; }
@@ -130,10 +95,11 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+  padding-top: 80px;
 }
 .intro {
-  font-size: 1.8em;
+  font-size: 1.6em;
   text-align: center;
   color: #fff;
   margin-bottom: 25px;
@@ -157,7 +123,7 @@ body {
 .bot {
   align-self: flex-start;
   background: linear-gradient(135deg, #c8e7ff, #e3c8ff);
-  padding: 18px;
+  padding: 14px;
   border-radius: 25px 25px 25px 5px;
   max-width: 85%;
   color: #333;
@@ -168,7 +134,7 @@ body {
 .user {
   align-self: flex-end;
   background: linear-gradient(135deg, #ffd6eb, #ffc8d6);
-  padding: 18px;
+  padding: 14px;
   border-radius: 25px 25px 5px 25px;
   max-width: 85%;
   color: #333;
