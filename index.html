@@ -5,8 +5,23 @@
   <title>IsaBot 💕</title>
   <link rel="stylesheet" href="style.css">
   <link rel="icon" type="image/png" href="favicon.png">
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
 </head>
 <body>
+  <!-- Registro/Login -->
+  <div class="auth-container">
+    <h2>Registro / Login</h2>
+    <input type="text" id="username" placeholder="Nombre">
+    <input type="email" id="email" placeholder="Correo">
+    <input type="password" id="password" placeholder="Contraseña">
+    <button id="registerBtn">Registrarse</button>
+    <button id="loginBtn">Iniciar sesión</button>
+  </div>
+
   <!-- Botón menú -->
   <button id="menuBtn" class="menu-btn">☰</button>
 
@@ -15,17 +30,17 @@
     <h2>Mis Chats 💬</h2>
     <ul id="chatList"></ul>
     <button id="newChatBtn">➕ Nuevo chat</button>
-    <footer class="sidebar-footer">
-      👤 Isabella 💕
+    <footer class="sidebar-footer" id="userFooter">
+      👤 Invitado
     </footer>
   </div>
 
-  <!-- Logo arriba a la derecha -->
+  <!-- Logo -->
   <header class="header">
     <h1 class="logo">IsaBot 💕</h1>
   </header>
 
-  <!-- Texto central -->
+  <!-- Área principal -->
   <div class="main">
     <h2 class="intro">Hola ¿cómo estás?<br>¿Por dónde empezamos?</h2>
     <div class="messages" id="messages"></div>
