@@ -9,6 +9,10 @@ const userInput = document.getElementById("userInput");
 let currentUser = null;
 let currentChatId = null;
 
+// COLOCO ESTA VARIABLE CON LA DIRECCIÓN DE TU RASPBERRY PI 5
+// Cambia '192.168.x.x' por la dirección IP real de tu Raspberry Pi
+const IP_RASPBERRY = "http://192.168.80.31:5000/api/chat"; 
+
 // Lista de emojis para asignar
 const emojis = ["🌸","🌈","⭐","🔥","🍀","🐱","🐶","🎵","💎","⚡","🦋","🌻"];
 function getRandomEmoji() {
@@ -36,7 +40,7 @@ newChatBtn.addEventListener("click", () => {
   loadChats();
 });
 
-// Guardar chat en localStorage (puedes cambiar a Firestore)
+// Guardar chat en localStorage
 function saveChat(chat) {
   let chats = JSON.parse(localStorage.getItem("chats")) || [];
   chats.push(chat);
@@ -103,6 +107,7 @@ function openChat(chatId) {
     bubble.textContent = msg.text;
     messages.appendChild(bubble);
   });
+  messages.scrollTop = messages.scrollHeight;
 }
 
 // Enviar mensaje
@@ -114,33 +119,77 @@ userInput.addEventListener("keypress", (event) => {
   }
 });
 
-function sendMessage() {
+// FUNCIÓN MODIFICADA PARA PASAR EL MENSAJE A LA IA LOCAL
+async function sendMessage() {
   const text = userInput.value.trim();
   if (text !== "" && currentChatId) {
+    
+    // 1. Pintar mensaje del usuario en la pantalla
     const userBubble = document.createElement("div");
     userBubble.className = "user";
     userBubble.textContent = text;
     messages.appendChild(userBubble);
 
+    // Guardar en almacenamiento local
     let chats = JSON.parse(localStorage.getItem("chats")) || [];
     const chat = chats.find(c => c.id === currentChatId);
     chat.messages.push({ sender: "user", text });
     updateChat(chat);
 
-    setTimeout(() => {
-      const botText = "IsaBot 💕 dice: " + text + " 🌸✨";
+    // Limpiar input y hacer scroll abajo
+    userInput.value = "";
+    messages.scrollTop = messages.scrollHeight;
+
+    // 2. Crear burbuja temporal de "Pensando..." para que se vea interactivo
+    const thinkingBubble = document.createElement("div");
+    thinkingBubble.className = "bot thinking";
+    thinkingBubble.textContent = "IsaBot está pensando... 🌸✨";
+    messages.appendChild(thinkingBubble);
+    messages.scrollTop = messages.scrollHeight;
+
+    try {
+      // 3. Petición POST HTTP directo a la Raspberry Pi 5
+      const response = await fetch(IP_RASPBERRY, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ mensaje: text })
+      });
+
+      const data = await response.get_json ? await response.get_json() : await response.json();
+      
+      // Eliminar burbuja de pensando
+      messages.removeChild(thinkingBubble);
+
+      // Obtener el texto que devolvió TinyLlama
+      const botText = data.respuesta || "No obtuve una respuesta clara, inténtalo de nuevo 💕";
+
+      // 4. Pintar respuesta real de la IA en la pantalla
       const botBubble = document.createElement("div");
       botBubble.className = "bot";
       botBubble.textContent = botText;
       messages.appendChild(botBubble);
 
+      // Guardar mensaje de la IA en el historial
       chat.messages.push({ sender: "bot", text: botText });
       updateChat(chat);
 
-      messages.scrollTop = messages.scrollHeight;
-    }, 600);
+    } catch (error) {
+      console.error("Error al conectar con la IA de la Raspberry:", error);
+      
+      // Quitar burbuja de pensando
+      if (messages.contains(thinkingBubble)) {
+        messages.removeChild(thinkingBubble);
+      }
 
-    userInput.value = "";
+      // Mostrar error amigable en la interfaz
+      const errorBubble = document.createElement("div");
+      errorBubble.className = "bot error";
+      errorBubble.textContent = "Ocurrió un error al intentar despertar a mi cerebro en la Raspberry Pi 5. 💔";
+      messages.appendChild(errorBubble);
+    }
+
     messages.scrollTop = messages.scrollHeight;
   }
 }
