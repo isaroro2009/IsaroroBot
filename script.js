@@ -5,19 +5,25 @@ const chatList = document.getElementById("chatList");
 const messages = document.getElementById("messages");
 const sendBtn = document.getElementById("sendBtn");
 const userInput = document.getElementById("userInput");
+const menuBtn = document.getElementById("menuBtn");
+const sidebar = document.getElementById("sidebar");
 
 let currentUser = null;
 let currentChatId = null;
 
-// COLOCO ESTA VARIABLE CON LA DIRECCIÓN DE TU RASPBERRY PI 5
-// Cambia '192.168.x.x' por la dirección IP real de tu Raspberry Pi
+// IP de tu Raspberry Pi 5 ejecutando el servidor de IA local con Flask
 const IP_RASPBERRY = "http://192.168.80.31:5000/api/chat"; 
 
-// Lista de emojis para asignar
+// Lista de emojis para asignar al usuario
 const emojis = ["🌸","🌈","⭐","🔥","🍀","🐱","🐶","🎵","💎","⚡","🦋","🌻"];
 function getRandomEmoji() {
   return emojis[Math.floor(Math.random() * emojis.length)];
 }
+
+// Control para abrir y cerrar el menú lateral deslizable
+menuBtn.addEventListener("click", () => {
+  sidebar.classList.toggle("open");
+});
 
 // Iniciar sesión con nombre
 nameLoginBtn.addEventListener("click", () => {
@@ -38,6 +44,7 @@ newChatBtn.addEventListener("click", () => {
   const chatData = { id: chatId, owner: currentUser, messages: [], pinned: false, createdAt: new Date() };
   saveChat(chatData);
   loadChats();
+  openChat(chatId); // Abre el chat automáticamente al crearlo
 });
 
 // Guardar chat en localStorage
@@ -53,16 +60,20 @@ function loadChats() {
   let chats = JSON.parse(localStorage.getItem("chats")) || [];
   chats.filter(c => c.owner === currentUser).forEach(chat => {
     const li = document.createElement("li");
-    li.textContent = chat.id + " (" + new Date(chat.createdAt).toLocaleString() + ")";
+    li.textContent = "Chat " + new Date(chat.createdAt).toLocaleTimeString();
     if (chat.pinned) li.classList.add("pinned");
 
-    // Acciones
+    // Acciones del chat (Pin y Borrar)
     const actions = document.createElement("div");
     actions.className = "chat-actions";
 
     const pinBtn = document.createElement("button");
     pinBtn.textContent = "📌";
-    pinBtn.addEventListener("click", () => {
+    pinBtn.style.border = "none";
+    pinBtn.style.background = "transparent";
+    pinBtn.style.cursor = "pointer";
+    pinBtn.addEventListener("click", (e) => {
+      e.stopPropagation(); // Evita que se abra el chat al hacer clic en pin
       chat.pinned = !chat.pinned;
       updateChat(chat);
       loadChats();
@@ -70,16 +81,27 @@ function loadChats() {
 
     const delBtn = document.createElement("button");
     delBtn.textContent = "🗑️";
-    delBtn.addEventListener("click", () => {
+    delBtn.style.border = "none";
+    delBtn.style.background = "transparent";
+    delBtn.style.cursor = "pointer";
+    delBtn.addEventListener("click", (e) => {
+      e.stopPropagation(); // Evita que se abra al borrar
       deleteChat(chat.id);
       loadChats();
+      if (currentChatId === chat.id) {
+        messages.innerHTML = "";
+        currentChatId = null;
+      }
     });
 
     actions.appendChild(pinBtn);
     actions.appendChild(delBtn);
     li.appendChild(actions);
 
-    li.addEventListener("click", () => openChat(chat.id));
+    li.addEventListener("click", () => {
+      openChat(chat.id);
+      sidebar.classList.remove("open"); // Cierra la barra lateral al elegir chat en móviles
+    });
     chatList.appendChild(li);
   });
 }
@@ -101,12 +123,14 @@ function openChat(chatId) {
   messages.innerHTML = "";
   let chats = JSON.parse(localStorage.getItem("chats")) || [];
   const chat = chats.find(c => c.id === chatId);
-  chat.messages.forEach(msg => {
-    const bubble = document.createElement("div");
-    bubble.className = msg.sender;
-    bubble.textContent = msg.text;
-    messages.appendChild(bubble);
-  });
+  if (chat) {
+    chat.messages.forEach(msg => {
+      const bubble = document.createElement("div");
+      bubble.className = msg.sender;
+      bubble.textContent = msg.text;
+      messages.appendChild(bubble);
+    });
+  }
   messages.scrollTop = messages.scrollHeight;
 }
 
@@ -119,28 +143,30 @@ userInput.addEventListener("keypress", (event) => {
   }
 });
 
-// FUNCIÓN MODIFICADA PARA PASAR EL MENSAJE A LA IA LOCAL
+// Enviar mensaje e interactuar con la API de la Raspberry Pi 5
 async function sendMessage() {
   const text = userInput.value.trim();
+  
+  if (!currentChatId) {
+    return alert("Por favor, selecciona o crea un chat en el panel lateral izquierdo primero ✨");
+  }
+
   if (text !== "" && currentChatId) {
-    
-    // 1. Pintar mensaje del usuario en la pantalla
+    // 1. Añadir mensaje del usuario en pantalla
     const userBubble = document.createElement("div");
     userBubble.className = "user";
     userBubble.textContent = text;
     messages.appendChild(userBubble);
 
-    // Guardar en almacenamiento local
     let chats = JSON.parse(localStorage.getItem("chats")) || [];
     const chat = chats.find(c => c.id === currentChatId);
     chat.messages.push({ sender: "user", text });
     updateChat(chat);
 
-    // Limpiar input y hacer scroll abajo
     userInput.value = "";
     messages.scrollTop = messages.scrollHeight;
 
-    // 2. Crear burbuja temporal de "Pensando..." para que se vea interactivo
+    // 2. Añadir burbuja de carga simulada de IsaBot
     const thinkingBubble = document.createElement("div");
     thinkingBubble.className = "bot thinking";
     thinkingBubble.textContent = "IsaBot está pensando... 🌸✨";
@@ -148,7 +174,7 @@ async function sendMessage() {
     messages.scrollTop = messages.scrollHeight;
 
     try {
-      // 3. Petición POST HTTP directo a la Raspberry Pi 5
+      // 3. Consulta POST a la Raspberry Pi 5 local
       const response = await fetch(IP_RASPBERRY, {
         method: "POST",
         headers: {
@@ -157,33 +183,29 @@ async function sendMessage() {
         body: JSON.stringify({ mensaje: text })
       });
 
-      const data = await response.get_json ? await response.get_json() : await response.json();
+      const data = await response.json();
       
-      // Eliminar burbuja de pensando
-      messages.removeChild(thinkingBubble);
+      if (messages.contains(thinkingBubble)) {
+        messages.removeChild(thinkingBubble);
+      }
 
-      // Obtener el texto que devolvió TinyLlama
       const botText = data.respuesta || "No obtuve una respuesta clara, inténtalo de nuevo 💕";
 
-      // 4. Pintar respuesta real de la IA en la pantalla
+      // 4. Mostrar respuesta real de la IA
       const botBubble = document.createElement("div");
       botBubble.className = "bot";
       botBubble.textContent = botText;
       messages.appendChild(botBubble);
 
-      // Guardar mensaje de la IA en el historial
       chat.messages.push({ sender: "bot", text: botText });
       updateChat(chat);
 
     } catch (error) {
-      console.error("Error al conectar con la IA de la Raspberry:", error);
-      
-      // Quitar burbuja de pensando
+      console.error("Error al conectar con la Raspberry:", error);
       if (messages.contains(thinkingBubble)) {
         messages.removeChild(thinkingBubble);
       }
 
-      // Mostrar error amigable en la interfaz
       const errorBubble = document.createElement("div");
       errorBubble.className = "bot error";
       errorBubble.textContent = "Ocurrió un error al intentar despertar a mi cerebro en la Raspberry Pi 5. 💔";
