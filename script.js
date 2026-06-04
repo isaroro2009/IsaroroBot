@@ -11,8 +11,8 @@ const sidebar = document.getElementById("sidebar");
 let currentUser = null;
 let currentChatId = null;
 
-// IP de tu Raspberry Pi 5 ejecutando el servidor de IA local con Flask
-const IP_RASPBERRY = "http://192.168.80.31:5000/api/chat"; 
+// Línea 14 de tu script.js actualizado para producción global:
+const IP_RASPBERRY = "https://anthem-enactment-exuberant.ngrok-free.dev/api/chat";
 
 // Lista de emojis para asignar al usuario
 const emojis = ["🌸","🌈","⭐","🔥","🍀","🐱","🐶","🎵","💎","⚡","🦋","🌻"];
