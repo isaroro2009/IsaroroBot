@@ -55,8 +55,4 @@ Creado con mucho amor, código y café por Isabella Rodriguez. 🚀✨
 
 ---
 
-### 💡 Un tip pro:
-Si quieres ver cómo queda renderizado de forma bonita en tu iMac antes de subirlo a algún lado, puedes abrir este archivo en editores como **Visual Studio Code** y presionar `Ctrl + Shift + V` (o `Cmd + Shift + V` en Mac) para ver la vista previa con todos sus títulos, emojis y bloques de código bien ordenados. 
-
-¿Te gustaría que le agreguemos alguna sección extra, como los comandos que tienes pensado crearle a futuro? 🌟
 
