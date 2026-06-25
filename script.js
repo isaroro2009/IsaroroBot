@@ -11,8 +11,8 @@ const sidebar = document.getElementById("sidebar");
 let currentUser = null;
 let currentChatId = null;
 
-// Línea 14 de tu script.js actualizado para producción global:
-const IP_RASPBERRY = "https://anthem-enactment-exuberant.ngrok-free.dev/api/chat";
+// URL del servidor Flask en Colab — actualiza esto cada vez que reinicies Colab
+const ISABOT_URL = "https://anthem-enactment-exuberant.ngrok-free.dev/chat";
 
 // Lista de emojis para asignar al usuario
 const emojis = ["🌸","🌈","⭐","🔥","🍀","🐱","🐶","🎵","💎","⚡","🦋","🌻"];
@@ -44,7 +44,7 @@ newChatBtn.addEventListener("click", () => {
   const chatData = { id: chatId, owner: currentUser, messages: [], pinned: false, createdAt: new Date() };
   saveChat(chatData);
   loadChats();
-  openChat(chatId); // Abre el chat automáticamente al crearlo
+  openChat(chatId);
 });
 
 // Guardar chat en localStorage
@@ -63,7 +63,6 @@ function loadChats() {
     li.textContent = "Chat " + new Date(chat.createdAt).toLocaleTimeString();
     if (chat.pinned) li.classList.add("pinned");
 
-    // Acciones del chat (Pin y Borrar)
     const actions = document.createElement("div");
     actions.className = "chat-actions";
 
@@ -73,7 +72,7 @@ function loadChats() {
     pinBtn.style.background = "transparent";
     pinBtn.style.cursor = "pointer";
     pinBtn.addEventListener("click", (e) => {
-      e.stopPropagation(); // Evita que se abra el chat al hacer clic en pin
+      e.stopPropagation();
       chat.pinned = !chat.pinned;
       updateChat(chat);
       loadChats();
@@ -85,7 +84,7 @@ function loadChats() {
     delBtn.style.background = "transparent";
     delBtn.style.cursor = "pointer";
     delBtn.addEventListener("click", (e) => {
-      e.stopPropagation(); // Evita que se abra al borrar
+      e.stopPropagation();
       deleteChat(chat.id);
       loadChats();
       if (currentChatId === chat.id) {
@@ -100,7 +99,7 @@ function loadChats() {
 
     li.addEventListener("click", () => {
       openChat(chat.id);
-      sidebar.classList.remove("open"); // Cierra la barra lateral al elegir chat en móviles
+      sidebar.classList.remove("open");
     });
     chatList.appendChild(li);
   });
@@ -143,16 +142,15 @@ userInput.addEventListener("keypress", (event) => {
   }
 });
 
-// Enviar mensaje e interactuar con la API de la Raspberry Pi 5
 async function sendMessage() {
   const text = userInput.value.trim();
-  
+
   if (!currentChatId) {
     return alert("Por favor, selecciona o crea un chat en el panel lateral izquierdo primero ✨");
   }
 
   if (text !== "" && currentChatId) {
-    // 1. Añadir mensaje del usuario en pantalla
+    // Mensaje del usuario
     const userBubble = document.createElement("div");
     userBubble.className = "user";
     userBubble.textContent = text;
@@ -166,7 +164,7 @@ async function sendMessage() {
     userInput.value = "";
     messages.scrollTop = messages.scrollHeight;
 
-    // 2. Añadir burbuja de carga simulada de IsaBot
+    // Burbuja de carga
     const thinkingBubble = document.createElement("div");
     thinkingBubble.className = "bot thinking";
     thinkingBubble.textContent = "IsaBot está pensando... 🌸✨";
@@ -174,24 +172,30 @@ async function sendMessage() {
     messages.scrollTop = messages.scrollHeight;
 
     try {
-      // 3. Consulta POST a la Raspberry Pi 5 local
-      const response = await fetch(IP_RASPBERRY, {
+      // Enviar a Flask en Colab con historial
+      const response = await fetch(ISABOT_URL, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "ngrok-skip-browser-warning": "true"
         },
-        body: JSON.stringify({ mensaje: text })
+        body: JSON.stringify({
+          mensaje: text,
+          historial: chat.messages.slice(0, -1).map(m => ({
+            role: m.sender === "user" ? "user" : "assistant",
+            content: m.text
+          }))
+        })
       });
 
       const data = await response.json();
-      
+
       if (messages.contains(thinkingBubble)) {
         messages.removeChild(thinkingBubble);
       }
 
       const botText = data.respuesta || "No obtuve una respuesta clara, inténtalo de nuevo 💕";
 
-      // 4. Mostrar respuesta real de la IA
       const botBubble = document.createElement("div");
       botBubble.className = "bot";
       botBubble.textContent = botText;
@@ -201,14 +205,14 @@ async function sendMessage() {
       updateChat(chat);
 
     } catch (error) {
-      console.error("Error al conectar con la Raspberry:", error);
+      console.error("Error al conectar con IsaBot:", error);
       if (messages.contains(thinkingBubble)) {
         messages.removeChild(thinkingBubble);
       }
 
       const errorBubble = document.createElement("div");
       errorBubble.className = "bot error";
-      errorBubble.textContent = "Ocurrió un error al intentar despertar a mi cerebro en la Raspberry Pi 5. 💔";
+      errorBubble.textContent = "Kyaa~ no pude conectarme con mi cerebro en Colab 💔 ¿Está corriendo el servidor?";
       messages.appendChild(errorBubble);
     }
 
