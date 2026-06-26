@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>IsaBot 💕</title>
   <link rel="stylesheet" href="style.css">
   <link rel="icon" type="image/png" href="favicon.png">
@@ -9,19 +10,21 @@
 </head>
 <body>
   <div class="chat-container" id="chatContainer">
+
     <button id="menuBtn" class="menu-btn">☰</button>
+
+    <!-- Overlay para cerrar sidebar en móvil -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <div class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <h2>Mis Chats 💬</h2>
       </div>
-      
       <div class="sidebar-content">
         <ul id="chatList"></ul>
       </div>
-      
       <div class="sidebar-actions-footer">
-        <button id="newChatBtn" class="kawaii-sidebar-btn chat-btn">✨ Nuevo chat ➕</button>
+        <button id="newChatBtn" class="kawaii-sidebar-btn">✨ Nuevo chat ➕</button>
         <footer class="sidebar-footer" id="userFooter">👤 Invitado</footer>
       </div>
     </div>
@@ -43,6 +46,7 @@
         <button id="sendBtn">➤</button>
       </div>
     </footer>
+
   </div>
 </body>
 </html>
