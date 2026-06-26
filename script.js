@@ -14,47 +14,199 @@ let currentChatId = null;
 // URL del servidor Flask en Colab — actualiza esto cada vez que reinicies Colab
 const ISABOT_URL = "https://anthem-enactment-exuberant.ngrok-free.dev/chat";
 
-// Lista de emojis para asignar al usuario
 const emojis = ["🌸","🌈","⭐","🔥","🍀","🐱","🐶","🎵","💎","⚡","🦋","🌻"];
 function getRandomEmoji() {
   return emojis[Math.floor(Math.random() * emojis.length)];
 }
 
-// Control para abrir y cerrar el menú lateral deslizable
+// ── AUTO LOGIN AL ABRIR LA PÁGINA ────────────────────────────────────────────
+window.addEventListener("load", () => {
+  // Ver si ya hay un usuario guardado
+  const savedUser = localStorage.getItem("isabot_user");
+
+  if (savedUser) {
+    // Ya inició sesión antes — entrar directo
+    currentUser = savedUser;
+    userFooter.textContent = "👤 " + currentUser;
+    loadChats();
+    autoOpenOrCreateChat();
+  } else {
+    // Primera vez — pedir nombre con un modal bonito
+    showLoginModal();
+  }
+});
+
+function showLoginModal() {
+  // Crear modal de bienvenida
+  const modal = document.createElement("div");
+  modal.id = "loginModal";
+  modal.style.cssText = `
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(255,182,193,0.6); backdrop-filter: blur(8px);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 9999;
+  `;
+
+  modal.innerHTML = `
+    <div style="
+      background: white; border-radius: 30px; padding: 40px 35px;
+      text-align: center; box-shadow: 0 10px 40px rgba(255,105,180,0.3);
+      max-width: 360px; width: 90%;
+    ">
+      <div style="font-size: 3em; margin-bottom: 10px;">💕</div>
+      <h2 style="color: #ff477e; margin: 0 0 8px 0; font-size: 1.6em;">¡Hola!</h2>
+      <p style="color: #888; margin: 0 0 25px 0; font-size: 1em;">
+        Soy IsaBot~ ¿Cómo te llamas? uwu 🌸
+      </p>
+      <input id="nameInput" type="text" placeholder="Tu nombre aquí..." style="
+        width: 100%; padding: 14px 18px; border: 2px solid #ffd6eb;
+        border-radius: 20px; font-size: 1em; outline: none;
+        box-sizing: border-box; color: #555; margin-bottom: 15px;
+        font-family: inherit;
+      ">
+      <button id="loginConfirmBtn" style="
+        width: 100%; padding: 14px; background: linear-gradient(135deg, #ffd6eb, #e3c8ff);
+        border: none; border-radius: 20px; font-size: 1em; font-weight: bold;
+        color: #555; cursor: pointer; box-shadow: 0 4px 12px rgba(255,179,198,0.4);
+        font-family: inherit;
+      ">¡Empezar a chatear! ✨</button>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  const nameInput = modal.querySelector("#nameInput");
+  const confirmBtn = modal.querySelector("#loginConfirmBtn");
+
+  nameInput.focus();
+
+  function confirmarLogin() {
+    const nombre = nameInput.value.trim();
+    if (!nombre) {
+      nameInput.style.border = "2px solid #ff477e";
+      nameInput.placeholder = "¡Pon tu nombre! 🌸";
+      return;
+    }
+    const emoji = getRandomEmoji();
+    currentUser = `${emoji} ${nombre}`;
+    localStorage.setItem("isabot_user", currentUser);
+    userFooter.textContent = "👤 " + currentUser;
+    modal.remove();
+    loadChats();
+    autoOpenOrCreateChat();
+  }
+
+  confirmBtn.addEventListener("click", confirmarLogin);
+  nameInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") confirmarLogin();
+  });
+}
+
+function autoOpenOrCreateChat() {
+  // Buscar si ya hay chats del usuario
+  let chats = JSON.parse(localStorage.getItem("chats")) || [];
+  const userChats = chats.filter(c => c.owner === currentUser);
+
+  if (userChats.length > 0) {
+    // Abrir el chat más reciente
+    const latest = userChats[userChats.length - 1];
+    openChat(latest.id);
+  } else {
+    // Crear un chat nuevo automáticamente
+    const chatId = "chat_" + Date.now();
+    const chatData = {
+      id: chatId,
+      owner: currentUser,
+      messages: [],
+      pinned: false,
+      createdAt: new Date()
+    };
+    saveChat(chatData);
+    loadChats();
+    openChat(chatId);
+
+    // Mensaje de bienvenida de IsaBot
+    setTimeout(() => {
+      const welcomeBubble = document.createElement("div");
+      welcomeBubble.className = "bot";
+      const nombre = currentUser.split(" ").slice(1).join(" ");
+      welcomeBubble.textContent = `¡Kyaa~ hola ${nombre}! 💕 Soy IsaBot, tu asistente kawaii ✨ ¿En qué puedo ayudarte hoy? 🌸`;
+      messages.appendChild(welcomeBubble);
+      messages.scrollTop = messages.scrollHeight;
+    }, 300);
+  }
+}
+
+// ── MENU LATERAL ─────────────────────────────────────────────────────────────
 menuBtn.addEventListener("click", () => {
   sidebar.classList.toggle("open");
 });
 
-// Iniciar sesión con nombre
 nameLoginBtn.addEventListener("click", () => {
-  const nombre = prompt("Ingresa tu nombre:");
-  if (nombre && nombre.trim() !== "") {
+  // Cambiar nombre desde el menú
+  const modal = document.createElement("div");
+  modal.style.cssText = `
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(255,182,193,0.6); backdrop-filter: blur(8px);
+    display: flex; align-items: center; justify-content: center; z-index: 9999;
+  `;
+  modal.innerHTML = `
+    <div style="
+      background: white; border-radius: 30px; padding: 35px;
+      text-align: center; box-shadow: 0 10px 40px rgba(255,105,180,0.3);
+      max-width: 340px; width: 90%;
+    ">
+      <div style="font-size: 2em; margin-bottom: 10px;">✏️</div>
+      <h3 style="color: #ff477e; margin: 0 0 15px 0;">Cambiar nombre</h3>
+      <input id="changeNameInput" type="text" placeholder="Nuevo nombre..." style="
+        width: 100%; padding: 12px 16px; border: 2px solid #ffd6eb;
+        border-radius: 20px; font-size: 1em; outline: none;
+        box-sizing: border-box; margin-bottom: 12px; font-family: inherit;
+      ">
+      <button id="changeConfirmBtn" style="
+        width: 100%; padding: 12px; background: linear-gradient(135deg, #ffd6eb, #e3c8ff);
+        border: none; border-radius: 20px; font-size: 1em; font-weight: bold;
+        color: #555; cursor: pointer; font-family: inherit; margin-bottom: 8px;
+      ">Guardar ✨</button>
+      <button id="changeCancelBtn" style="
+        width: 100%; padding: 10px; background: transparent;
+        border: 2px solid #ffd6eb; border-radius: 20px; font-size: 0.9em;
+        color: #aaa; cursor: pointer; font-family: inherit;
+      ">Cancelar</button>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  modal.querySelector("#changeConfirmBtn").addEventListener("click", () => {
+    const nombre = modal.querySelector("#changeNameInput").value.trim();
+    if (!nombre) return;
     const emoji = getRandomEmoji();
     currentUser = `${emoji} ${nombre}`;
+    localStorage.setItem("isabot_user", currentUser);
     userFooter.textContent = "👤 " + currentUser;
-    alert("Bienvenido " + currentUser + " 💕");
+    modal.remove();
+    sidebar.classList.remove("open");
     loadChats();
-  }
+  });
+  modal.querySelector("#changeCancelBtn").addEventListener("click", () => modal.remove());
 });
 
-// Crear chat
+// ── CHATS ─────────────────────────────────────────────────────────────────────
 newChatBtn.addEventListener("click", () => {
-  if (!currentUser) return alert("Primero inicia sesión con tu nombre ✨");
+  if (!currentUser) return;
   const chatId = "chat_" + Date.now();
   const chatData = { id: chatId, owner: currentUser, messages: [], pinned: false, createdAt: new Date() };
   saveChat(chatData);
   loadChats();
   openChat(chatId);
+  sidebar.classList.remove("open");
 });
 
-// Guardar chat en localStorage
 function saveChat(chat) {
   let chats = JSON.parse(localStorage.getItem("chats")) || [];
   chats.push(chat);
   localStorage.setItem("chats", JSON.stringify(chats));
 }
 
-// Cargar chats del usuario
 function loadChats() {
   chatList.innerHTML = "";
   let chats = JSON.parse(localStorage.getItem("chats")) || [];
@@ -68,9 +220,7 @@ function loadChats() {
 
     const pinBtn = document.createElement("button");
     pinBtn.textContent = "📌";
-    pinBtn.style.border = "none";
-    pinBtn.style.background = "transparent";
-    pinBtn.style.cursor = "pointer";
+    pinBtn.style.cssText = "border:none;background:transparent;cursor:pointer;";
     pinBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       chat.pinned = !chat.pinned;
@@ -80,9 +230,7 @@ function loadChats() {
 
     const delBtn = document.createElement("button");
     delBtn.textContent = "🗑️";
-    delBtn.style.border = "none";
-    delBtn.style.background = "transparent";
-    delBtn.style.cursor = "pointer";
+    delBtn.style.cssText = "border:none;background:transparent;cursor:pointer;";
     delBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       deleteChat(chat.id);
@@ -133,89 +281,69 @@ function openChat(chatId) {
   messages.scrollTop = messages.scrollHeight;
 }
 
-// Enviar mensaje
+// ── ENVIAR MENSAJE ────────────────────────────────────────────────────────────
 sendBtn.addEventListener("click", sendMessage);
-userInput.addEventListener("keypress", (event) => {
-  if (event.key === "Enter") {
-    event.preventDefault();
-    sendMessage();
-  }
+userInput.addEventListener("keypress", (e) => {
+  if (e.key === "Enter") { e.preventDefault(); sendMessage(); }
 });
 
 async function sendMessage() {
   const text = userInput.value.trim();
+  if (!currentChatId || text === "") return;
 
-  if (!currentChatId) {
-    return alert("Por favor, selecciona o crea un chat en el panel lateral izquierdo primero ✨");
-  }
+  const userBubble = document.createElement("div");
+  userBubble.className = "user";
+  userBubble.textContent = text;
+  messages.appendChild(userBubble);
 
-  if (text !== "" && currentChatId) {
-    // Mensaje del usuario
-    const userBubble = document.createElement("div");
-    userBubble.className = "user";
-    userBubble.textContent = text;
-    messages.appendChild(userBubble);
+  let chats = JSON.parse(localStorage.getItem("chats")) || [];
+  const chat = chats.find(c => c.id === currentChatId);
+  chat.messages.push({ sender: "user", text });
+  updateChat(chat);
+  userInput.value = "";
+  messages.scrollTop = messages.scrollHeight;
 
-    let chats = JSON.parse(localStorage.getItem("chats")) || [];
-    const chat = chats.find(c => c.id === currentChatId);
-    chat.messages.push({ sender: "user", text });
+  const thinkingBubble = document.createElement("div");
+  thinkingBubble.className = "bot thinking";
+  thinkingBubble.textContent = "IsaBot está pensando... 🌸✨";
+  messages.appendChild(thinkingBubble);
+  messages.scrollTop = messages.scrollHeight;
+
+  try {
+    const response = await fetch(ISABOT_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "ngrok-skip-browser-warning": "true"
+      },
+      body: JSON.stringify({
+        mensaje: text,
+        historial: chat.messages.slice(0, -1).map(m => ({
+          role: m.sender === "user" ? "user" : "assistant",
+          content: m.text
+        }))
+      })
+    });
+
+    const data = await response.json();
+    if (messages.contains(thinkingBubble)) messages.removeChild(thinkingBubble);
+
+    const botText = data.respuesta || "No obtuve respuesta, intenta de nuevo 💕";
+    const botBubble = document.createElement("div");
+    botBubble.className = "bot";
+    botBubble.textContent = botText;
+    messages.appendChild(botBubble);
+
+    chat.messages.push({ sender: "bot", text: botText });
     updateChat(chat);
 
-    userInput.value = "";
-    messages.scrollTop = messages.scrollHeight;
-
-    // Burbuja de carga
-    const thinkingBubble = document.createElement("div");
-    thinkingBubble.className = "bot thinking";
-    thinkingBubble.textContent = "IsaBot está pensando... 🌸✨";
-    messages.appendChild(thinkingBubble);
-    messages.scrollTop = messages.scrollHeight;
-
-    try {
-      // Enviar a Flask en Colab con historial
-      const response = await fetch(ISABOT_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "ngrok-skip-browser-warning": "true"
-        },
-        body: JSON.stringify({
-          mensaje: text,
-          historial: chat.messages.slice(0, -1).map(m => ({
-            role: m.sender === "user" ? "user" : "assistant",
-            content: m.text
-          }))
-        })
-      });
-
-      const data = await response.json();
-
-      if (messages.contains(thinkingBubble)) {
-        messages.removeChild(thinkingBubble);
-      }
-
-      const botText = data.respuesta || "No obtuve una respuesta clara, inténtalo de nuevo 💕";
-
-      const botBubble = document.createElement("div");
-      botBubble.className = "bot";
-      botBubble.textContent = botText;
-      messages.appendChild(botBubble);
-
-      chat.messages.push({ sender: "bot", text: botText });
-      updateChat(chat);
-
-    } catch (error) {
-      console.error("Error al conectar con IsaBot:", error);
-      if (messages.contains(thinkingBubble)) {
-        messages.removeChild(thinkingBubble);
-      }
-
-      const errorBubble = document.createElement("div");
-      errorBubble.className = "bot error";
-      errorBubble.textContent = "Kyaa~ no pude conectarme con mi cerebro en Colab 💔 ¿Está corriendo el servidor?";
-      messages.appendChild(errorBubble);
-    }
-
-    messages.scrollTop = messages.scrollHeight;
+  } catch (error) {
+    if (messages.contains(thinkingBubble)) messages.removeChild(thinkingBubble);
+    const errorBubble = document.createElement("div");
+    errorBubble.className = "bot error";
+    errorBubble.textContent = "Kyaa~ no pude conectarme con mi cerebro en Colab 💔 ¿Está corriendo el servidor?";
+    messages.appendChild(errorBubble);
   }
+
+  messages.scrollTop = messages.scrollHeight;
 }
