@@ -1,4 +1,3 @@
-const nameLoginBtn = document.getElementById("nameLoginBtn");
 const userFooter = document.getElementById("userFooter");
 const newChatBtn = document.getElementById("newChatBtn");
 const chatList = document.getElementById("chatList");
@@ -142,53 +141,7 @@ menuBtn.addEventListener("click", () => {
   sidebar.classList.toggle("open");
 });
 
-nameLoginBtn.addEventListener("click", () => {
-  // Cambiar nombre desde el menú
-  const modal = document.createElement("div");
-  modal.style.cssText = `
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(255,182,193,0.6); backdrop-filter: blur(8px);
-    display: flex; align-items: center; justify-content: center; z-index: 9999;
-  `;
-  modal.innerHTML = `
-    <div style="
-      background: white; border-radius: 30px; padding: 35px;
-      text-align: center; box-shadow: 0 10px 40px rgba(255,105,180,0.3);
-      max-width: 340px; width: 90%;
-    ">
-      <div style="font-size: 2em; margin-bottom: 10px;">✏️</div>
-      <h3 style="color: #ff477e; margin: 0 0 15px 0;">Cambiar nombre</h3>
-      <input id="changeNameInput" type="text" placeholder="Nuevo nombre..." style="
-        width: 100%; padding: 12px 16px; border: 2px solid #ffd6eb;
-        border-radius: 20px; font-size: 1em; outline: none;
-        box-sizing: border-box; margin-bottom: 12px; font-family: inherit;
-      ">
-      <button id="changeConfirmBtn" style="
-        width: 100%; padding: 12px; background: linear-gradient(135deg, #ffd6eb, #e3c8ff);
-        border: none; border-radius: 20px; font-size: 1em; font-weight: bold;
-        color: #555; cursor: pointer; font-family: inherit; margin-bottom: 8px;
-      ">Guardar ✨</button>
-      <button id="changeCancelBtn" style="
-        width: 100%; padding: 10px; background: transparent;
-        border: 2px solid #ffd6eb; border-radius: 20px; font-size: 0.9em;
-        color: #aaa; cursor: pointer; font-family: inherit;
-      ">Cancelar</button>
-    </div>
-  `;
-  document.body.appendChild(modal);
-  modal.querySelector("#changeConfirmBtn").addEventListener("click", () => {
-    const nombre = modal.querySelector("#changeNameInput").value.trim();
-    if (!nombre) return;
-    const emoji = getRandomEmoji();
-    currentUser = `${emoji} ${nombre}`;
-    localStorage.setItem("isabot_user", currentUser);
-    userFooter.textContent = "👤 " + currentUser;
-    modal.remove();
-    sidebar.classList.remove("open");
-    loadChats();
-  });
-  modal.querySelector("#changeCancelBtn").addEventListener("click", () => modal.remove());
-});
+
 
 // ── CHATS ─────────────────────────────────────────────────────────────────────
 newChatBtn.addEventListener("click", () => {
