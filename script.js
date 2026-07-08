@@ -275,7 +275,9 @@ async function sendMessage() {
     const data = await response.json();
     if (messages.contains(thinkingBubble)) messages.removeChild(thinkingBubble);
 
-    const botText = data.respuesta || "No obtuve respuesta, intenta de nuevo 💕";
+    // 🌟 Súper-compatibilidad: Extrae el texto sin importar si el JSON viene con la clave "respuesta" o "response"
+    const botText = data.respuesta || data.response || data.text || "No obtuve respuesta, intenta de nuevo 💕";
+    
     const botBubble = document.createElement("div");
     botBubble.className = "bot";
     botBubble.textContent = botText;
