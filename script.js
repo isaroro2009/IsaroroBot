@@ -11,7 +11,7 @@ let currentUser = null;
 let currentChatId = null;
 
 // URL del servidor Flask en Colab — actualiza esto cada vez que reinicies Colab
-const ISABOT_URL = "https://gate-thumb-programme-near.trycloudflare.com/chat";
+const ISABOT_URL = "https://gate-thumb-programme-near.trycloudflare.com";
 
 const emojis = ["🌸","🌈","⭐","🔥","🍀","🐱","🐶","🎵","💎","⚡","🦋","🌻"];
 function getRandomEmoji() {
