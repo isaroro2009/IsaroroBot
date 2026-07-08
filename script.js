@@ -10,8 +10,13 @@ const sidebar = document.getElementById("sidebar");
 let currentUser = null;
 let currentChatId = null;
 
-// 🌐 URL de tu túnel de Cloudflare apuntando directo a la ruta /chat de tu iMac M1
-const ISABOT_URL = "https://gate-thumb-programme-near.trycloudflare.com/chat";
+// 🌐 URL de tu túnel activo de Cloudflare apuntando a la ruta /chat de tu iMac
+const CLOUDFLARE_URL = "https://indianapolis-oliver-thumbs-hispanic.trycloudflare.com/chat";
+
+// Lógica inteligente: Si pruebas la web en local usa localhost, si estás en GitHub Pages usa el túnel público
+const ISABOT_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" 
+  ? "http://localhost:5001/chat" 
+  : CLOUDFLARE_URL;
 
 const emojis = ["🌸","🌈","⭐","🔥","🍀","🐱","🐶","🎵","💎","⚡","🦋","🌻"];
 function getRandomEmoji() {
@@ -20,23 +25,19 @@ function getRandomEmoji() {
 
 // ── AUTO LOGIN AL ABRIR LA PÁGINA ────────────────────────────────────────────
 window.addEventListener("load", () => {
-  // Ver si ya hay un usuario guardado
   const savedUser = localStorage.getItem("isabot_user");
 
   if (savedUser) {
-    // Ya inició sesión antes — entrar directo
     currentUser = savedUser;
     userFooter.textContent = "👤 " + currentUser;
     loadChats();
     autoOpenOrCreateChat();
   } else {
-    // Primera vez — pedir nombre con un modal bonito
     showLoginModal();
   }
 });
 
 function showLoginModal() {
-  // Crear modal de bienvenida
   const modal = document.createElement("div");
   modal.id = "loginModal";
   modal.style.cssText = `
@@ -102,16 +103,13 @@ function showLoginModal() {
 }
 
 function autoOpenOrCreateChat() {
-  // Buscar si ya hay chats del usuario
   let chats = JSON.parse(localStorage.getItem("chats")) || [];
   const userChats = chats.filter(c => c.owner === currentUser);
 
   if (userChats.length > 0) {
-    // Abrir el chat más reciente
     const latest = userChats[userChats.length - 1];
     openChat(latest.id);
   } else {
-    // Crear un chat nuevo automáticamente
     const chatId = "chat_" + Date.now();
     const chatData = {
       id: chatId,
@@ -124,7 +122,6 @@ function autoOpenOrCreateChat() {
     loadChats();
     openChat(chatId);
 
-    // Mensaje de bienvenida de IsaBot
     setTimeout(() => {
       const welcomeBubble = document.createElement("div");
       welcomeBubble.className = "bot";
@@ -264,8 +261,7 @@ async function sendMessage() {
     const response = await fetch(ISABOT_URL, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
-        "ngrok-skip-browser-warning": "true"
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({
         mensaje: text,
@@ -292,7 +288,6 @@ async function sendMessage() {
     if (messages.contains(thinkingBubble)) messages.removeChild(thinkingBubble);
     const errorBubble = document.createElement("div");
     errorBubble.className = "bot error";
-    // 🛠️ Mensaje actualizado con tu nueva infraestructura local
     errorBubble.textContent = "Kyaa~ no pude conectarme con mi cerebro local en la iMac 💔 ¿Encendiste el server.py?";
     messages.appendChild(errorBubble);
   }
