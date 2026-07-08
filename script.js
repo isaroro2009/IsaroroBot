@@ -10,8 +10,8 @@ const sidebar = document.getElementById("sidebar");
 let currentUser = null;
 let currentChatId = null;
 
-// URL del servidor Flask en Colab — actualiza esto cada vez que reinicies Colab
-const ISABOT_URL = "https://gate-thumb-programme-near.trycloudflare.com";
+// 🌐 URL de tu túnel de Cloudflare apuntando directo a la ruta /chat de tu iMac M1
+const ISABOT_URL = "https://gate-thumb-programme-near.trycloudflare.com/chat";
 
 const emojis = ["🌸","🌈","⭐","🔥","🍀","🐱","🐶","🎵","💎","⚡","🦋","🌻"];
 function getRandomEmoji() {
@@ -140,8 +140,6 @@ function autoOpenOrCreateChat() {
 menuBtn.addEventListener("click", () => {
   sidebar.classList.toggle("open");
 });
-
-
 
 // ── CHATS ─────────────────────────────────────────────────────────────────────
 newChatBtn.addEventListener("click", () => {
@@ -294,7 +292,8 @@ async function sendMessage() {
     if (messages.contains(thinkingBubble)) messages.removeChild(thinkingBubble);
     const errorBubble = document.createElement("div");
     errorBubble.className = "bot error";
-    errorBubble.textContent = "Kyaa~ no pude conectarme con mi cerebro en Colab 💔 ¿Está corriendo el servidor?";
+    // 🛠️ Mensaje actualizado con tu nueva infraestructura local
+    errorBubble.textContent = "Kyaa~ no pude conectarme con mi cerebro local en la iMac 💔 ¿Encendiste el server.py?";
     messages.appendChild(errorBubble);
   }
 
