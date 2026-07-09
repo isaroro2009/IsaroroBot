@@ -27,16 +27,22 @@ const KAWAII_ROBOT_SVG = `
 </svg>
 `;
 
-// ⚙️ Crear e Inyectar Botón de Configuración arriba a la derecha de la pantalla
+// ⚙️ Crear el Botón de Configuración (¡Ahora dentro del menú lateral! 🍔)
 const settingsBtn = document.createElement("button");
 settingsBtn.id = "settingsBtn";
-settingsBtn.innerHTML = "⚙️";
+settingsBtn.innerHTML = "⚙️ Ajustes del Bot";
 settingsBtn.style.cssText = `
-  position: fixed; top: 15px; right: 20px; background: white; border: 2px solid #ffd6eb;
-  width: 42px; height: 42px; border-radius: 50%; font-size: 1.4em; cursor: pointer;
-  display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-  z-index: 999; transition: transform 0.2s;
+  width: 100%; padding: 12px; margin-top: 20px; margin-bottom: 15px;
+  background: white; border: 2px solid #ffd6eb; border-radius: 15px;
+  font-size: 1em; font-weight: bold; color: #ff477e; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.02); font-family: inherit;
+  transition: background 0.2s;
 `;
+
+// Insertar el botón en la barra lateral justo arriba de la galería
+sidebar.insertBefore(settingsBtn, galleryContainer);
+
 document.body.appendChild(settingsBtn);
 
 // 🛠️ Crear Panel Modal de Configuración (Ajustes + Recordatorios)
