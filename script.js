@@ -10,8 +10,8 @@ const sidebar = document.getElementById("sidebar");
 let currentUser = null;
 let currentChatId = null;
 
-// 🌐 URL de tu túnel activo de Cloudflare apuntando a la ruta /chat de tu iMac
-const CLOUDFLARE_URL = "https://indianapolis-oliver-thumbs-hispanic.trycloudflare.com/chat";
+// 🌐 URL de tu túnel ACTIVO de Cloudflare (¡Actualizado hoy!)
+const CLOUDFLARE_URL = "https://glad-entrepreneur-cancer-cdna.trycloudflare.com/chat";
 
 // Lógica inteligente: Si pruebas la web en local usa localhost, si estás en GitHub Pages usa el túnel público
 const ISABOT_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" 
