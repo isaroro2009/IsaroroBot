@@ -7,13 +7,30 @@ const userInput = document.getElementById("userInput");
 const menuBtn = document.getElementById("menuBtn");
 const sidebar = document.getElementById("sidebar");
 
+// 🎨 Crear dinámicamente el contenedor de la Galería en la barra lateral
+const galleryContainer = document.createElement("div");
+galleryContainer.id = "galleryContainer";
+galleryContainer.style.cssText = `
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 2px dashed #ffd6eb;
+  max-height: 200px;
+  overflow-y: auto;
+`;
+galleryContainer.innerHTML = `
+  <h3 style="color: #ff477e; font-size: 1em; margin: 0 0 10px 0; display: flex; align-items: center; gap: 5px;">
+    🖼️ Galería de Arte
+  </h3>
+  <div id="galleryGrid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;"></div>
+`;
+sidebar.appendChild(galleryContainer);
+
 let currentUser = null;
 let currentChatId = null;
 
-// 🌐 URL de tu túnel ACTIVO de Cloudflare (¡Actualizado hoy!)
+// 🌐 URL de tu túnel ACTIVO de Cloudflare
 const CLOUDFLARE_URL = "https://glad-entrepreneur-cancer-cdna.trycloudflare.com/chat";
 
-// Lógica inteligente: Si pruebas la web en local usa localhost, si estás en GitHub Pages usa el túnel público
 const ISABOT_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" 
   ? "http://localhost:5001/chat" 
   : CLOUDFLARE_URL;
@@ -32,6 +49,7 @@ window.addEventListener("load", () => {
     userFooter.textContent = "👤 " + currentUser;
     loadChats();
     autoOpenOrCreateChat();
+    updateGallery(); // Cargar galería al iniciar
   } else {
     showLoginModal();
   }
@@ -94,6 +112,7 @@ function showLoginModal() {
     modal.remove();
     loadChats();
     autoOpenOrCreateChat();
+    updateGallery();
   }
 
   confirmBtn.addEventListener("click", confirmarLogin);
@@ -123,14 +142,41 @@ function autoOpenOrCreateChat() {
     openChat(chatId);
 
     setTimeout(() => {
-      const welcomeBubble = document.createElement("div");
-      welcomeBubble.className = "bot";
-      const nombre = currentUser.split(" ").slice(1).join(" ");
-      welcomeBubble.textContent = `¡Kyaa~ hola ${nombre}! 💕 Soy IsaBot, tu asistente kawaii ✨ ¿En qué puedo ayudarte hoy? 🌸`;
-      messages.appendChild(welcomeBubble);
-      messages.scrollTop = messages.scrollHeight;
+      appendBotMessage(`¡Kyaa~ hola! 💕 Soy IsaBot, tu asistente kawaii ✨ ¿En qué puedo ayudarte hoy? 🌸`);
     }, 300);
   }
+}
+
+// ── ACTUALIZAR GALERÍA ────────────────────────────────────────────────────────
+function updateGallery() {
+  const galleryGrid = document.getElementById("galleryGrid");
+  if (!galleryGrid) return;
+  galleryGrid.innerHTML = "";
+
+  let chats = JSON.parse(localStorage.getItem("chats")) || [];
+  // Filtramos todas las imágenes creadas por el usuario actual
+  chats.filter(c => c.owner === currentUser).forEach(chat => {
+    chat.messages.forEach(msg => {
+      if (msg.type === "imagen") {
+        const imgThumb = document.createElement("img");
+        imgThumb.src = msg.text;
+        imgThumb.style.cssText = `
+          width: 100%; 
+          height: 60px; 
+          object-fit: cover; 
+          border-radius: 8px; 
+          border: 1px solid #ffd6eb;
+          cursor: pointer;
+          transition: transform 0.2s;
+        `;
+        // Efecto hover y clic para ampliar temporalmente
+        imgThumb.addEventListener("click", () => {
+          window.open(msg.text, '_blank');
+        });
+        galleryGrid.appendChild(imgThumb);
+      }
+    });
+  });
 }
 
 // ── MENU LATERAL ─────────────────────────────────────────────────────────────
@@ -187,6 +233,7 @@ function loadChats() {
         messages.innerHTML = "";
         currentChatId = null;
       }
+      updateGallery();
     });
 
     actions.appendChild(pinBtn);
@@ -213,6 +260,42 @@ function deleteChat(chatId) {
   localStorage.setItem("chats", JSON.stringify(chats));
 }
 
+// ── FUNCIÓN PARA CREAR BURBUJAS DEL BOT CON EL AVATAR ROBOTSITO ───────────────
+function appendBotMessage(content, isImage = false) {
+  const container = document.createElement("div");
+  container.style.cssText = "display: flex; align-items: flex-end; gap: 8px; margin-bottom: 12px; width: 100%;";
+
+  // 🤖 Foto de perfil del Robotsito Kawaii
+  const avatar = document.createElement("div");
+  avatar.style.cssText = `
+    width: 35px; height: 35px; border-radius: 50%; 
+    background: #e3c8ff; border: 2px solid #ffd6eb;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3em; flex-shrink: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  `;
+  avatar.textContent = "🤖"; // Puedes cambiar este emoji por la URL de una foto si prefieres usando una etiqueta img
+
+  const bubble = document.createElement("div");
+  bubble.className = "bot";
+  bubble.style.margin = "0"; // Quitamos margen por defecto para alinear bien con el avatar
+
+  if (isImage) {
+    const img = document.createElement("img");
+    img.src = content;
+    img.style.cssText = "width: 100%; max-width: 280px; border-radius: 15px; margin-top: 5px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);";
+    bubble.textContent = "¡Mira lo que pinté para ti! 🎨✨\n";
+    bubble.appendChild(img);
+  } else {
+    bubble.textContent = content;
+  }
+
+  container.appendChild(avatar);
+  container.appendChild(bubble);
+  messages.appendChild(container);
+  messages.scrollTop = messages.scrollHeight;
+  return container;
+}
+
 function openChat(chatId) {
   currentChatId = chatId;
   messages.innerHTML = "";
@@ -220,18 +303,14 @@ function openChat(chatId) {
   const chat = chats.find(c => c.id === chatId);
   if (chat) {
     chat.messages.forEach(msg => {
-      const bubble = document.createElement("div");
-      bubble.className = msg.sender;
-      if (msg.type === "imagen") {
-        const img = document.createElement("img");
-        img.src = msg.text;
-        img.style.cssText = "width: 100%; max-width: 280px; border-radius: 15px; margin-top: 5px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);";
-        bubble.textContent = "¡Tu arte guardado! 🎨✨\n";
-        bubble.appendChild(img);
+      if (msg.sender === "user") {
+        const userBubble = document.createElement("div");
+        userBubble.className = "user";
+        userBubble.textContent = msg.text;
+        messages.appendChild(userBubble);
       } else {
-        bubble.textContent = msg.text;
+        appendBotMessage(msg.text, msg.type === "imagen");
       }
-      messages.appendChild(bubble);
     });
   }
   messages.scrollTop = messages.scrollHeight;
@@ -259,11 +338,8 @@ async function sendMessage() {
   userInput.value = "";
   messages.scrollTop = messages.scrollHeight;
 
-  const thinkingBubble = document.createElement("div");
-  thinkingBubble.className = "bot thinking";
-  thinkingBubble.textContent = "IsaBot está creando magia... 🌸✨";
-  messages.appendChild(thinkingBubble);
-  messages.scrollTop = messages.scrollHeight;
+  // Burbuja de pensando con el avatar integrado
+  const thinkingContainer = appendBotMessage("IsaBot está creando magia... 🌸✨");
 
   try {
     const response = await fetch(ISABOT_URL, {
@@ -281,32 +357,23 @@ async function sendMessage() {
     });
 
     const data = await response.json();
-    if (messages.contains(thinkingBubble)) messages.removeChild(thinkingBubble);
+    if (messages.contains(thinkingContainer)) messages.removeChild(thinkingContainer);
 
-    const botBubble = document.createElement("div");
-    botBubble.className = "bot";
-
-    // 🌟 COMPATIBILIDAD DINÁMICA: Revisa si el backend devolvió un dibujo en Base64 o texto
+    // 🌟 COMPATIBILIDAD DINÁMICA
     if (data.tipo === "imagen") {
-      const img = document.createElement("img");
-      img.src = data.respuesta;
-      img.style.cssText = "width: 100%; max-width: 280px; border-radius: 15px; margin-top: 5px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);";
-      
-      botBubble.textContent = "¡Mira lo que pinté para ti! 🎨✨\n";
-      botBubble.appendChild(img);
-      
+      appendBotMessage(data.respuesta, true);
       chat.messages.push({ sender: "bot", text: data.respuesta, type: "imagen" });
+      updateChat(chat);
+      updateGallery(); // Actualizar miniaturas al instante
     } else {
       const botText = data.respuesta || data.response || data.text || "No obtuve respuesta, intenta de nuevo 💕";
-      botBubble.textContent = botText;
+      appendBotMessage(botText, false);
       chat.messages.push({ sender: "bot", text: botText });
+      updateChat(chat);
     }
 
-    messages.appendChild(botBubble);
-    updateChat(chat);
-
   } catch (error) {
-    if (messages.contains(thinkingBubble)) messages.removeChild(thinkingBubble);
+    if (messages.contains(thinkingContainer)) messages.removeChild(thinkingContainer);
     const errorBubble = document.createElement("div");
     errorBubble.className = "bot error";
     errorBubble.textContent = "Kyaa~ no pude conectarme con mi cerebro de arte local 💔 ¿Encendiste el server.py?";
