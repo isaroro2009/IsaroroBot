@@ -222,7 +222,15 @@ function openChat(chatId) {
     chat.messages.forEach(msg => {
       const bubble = document.createElement("div");
       bubble.className = msg.sender;
-      bubble.textContent = msg.text;
+      if (msg.type === "imagen") {
+        const img = document.createElement("img");
+        img.src = msg.text;
+        img.style.cssText = "width: 100%; max-width: 280px; border-radius: 15px; margin-top: 5px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);";
+        bubble.textContent = "¡Tu arte guardado! 🎨✨\n";
+        bubble.appendChild(img);
+      } else {
+        bubble.textContent = msg.text;
+      }
       messages.appendChild(bubble);
     });
   }
@@ -253,7 +261,7 @@ async function sendMessage() {
 
   const thinkingBubble = document.createElement("div");
   thinkingBubble.className = "bot thinking";
-  thinkingBubble.textContent = "IsaBot está pensando... 🌸✨";
+  thinkingBubble.textContent = "IsaBot está creando magia... 🌸✨";
   messages.appendChild(thinkingBubble);
   messages.scrollTop = messages.scrollHeight;
 
@@ -267,7 +275,7 @@ async function sendMessage() {
         mensaje: text,
         historial: chat.messages.slice(0, -1).map(m => ({
           role: m.sender === "user" ? "user" : "assistant",
-          content: m.text
+          content: m.type === "imagen" ? "[Imagen]" : m.text
         }))
       })
     });
@@ -275,22 +283,33 @@ async function sendMessage() {
     const data = await response.json();
     if (messages.contains(thinkingBubble)) messages.removeChild(thinkingBubble);
 
-    // 🌟 Súper-compatibilidad: Extrae el texto sin importar si el JSON viene con la clave "respuesta" o "response"
-    const botText = data.respuesta || data.response || data.text || "No obtuve respuesta, intenta de nuevo 💕";
-    
     const botBubble = document.createElement("div");
     botBubble.className = "bot";
-    botBubble.textContent = botText;
-    messages.appendChild(botBubble);
 
-    chat.messages.push({ sender: "bot", text: botText });
+    // 🌟 COMPATIBILIDAD DINÁMICA: Revisa si el backend devolvió un dibujo en Base64 o texto
+    if (data.tipo === "imagen") {
+      const img = document.createElement("img");
+      img.src = data.respuesta;
+      img.style.cssText = "width: 100%; max-width: 280px; border-radius: 15px; margin-top: 5px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);";
+      
+      botBubble.textContent = "¡Mira lo que pinté para ti! 🎨✨\n";
+      botBubble.appendChild(img);
+      
+      chat.messages.push({ sender: "bot", text: data.respuesta, type: "imagen" });
+    } else {
+      const botText = data.respuesta || data.response || data.text || "No obtuve respuesta, intenta de nuevo 💕";
+      botBubble.textContent = botText;
+      chat.messages.push({ sender: "bot", text: botText });
+    }
+
+    messages.appendChild(botBubble);
     updateChat(chat);
 
   } catch (error) {
     if (messages.contains(thinkingBubble)) messages.removeChild(thinkingBubble);
     const errorBubble = document.createElement("div");
     errorBubble.className = "bot error";
-    errorBubble.textContent = "Kyaa~ no pude conectarme con mi cerebro local en la iMac 💔 ¿Encendiste el server.py?";
+    errorBubble.textContent = "Kyaa~ no pude conectarme con mi cerebro de arte local 💔 ¿Encendiste el server.py?";
     messages.appendChild(errorBubble);
   }
 
