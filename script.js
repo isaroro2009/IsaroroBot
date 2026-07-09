@@ -40,10 +40,20 @@ settingsBtn.style.cssText = `
   transition: background 0.2s;
 `;
 
-// Insertar el botón en la barra lateral justo arriba de la galería
-sidebar.insertBefore(settingsBtn, galleryContainer);
+// 🍔 Sección de la Galería dentro del Menú Hamburguesa
+const galleryContainer = document.createElement("div");
+galleryContainer.id = "galleryContainer";
+galleryContainer.style.cssText = "margin-top: auto; padding-top: 15px; border-top: 2px dashed #ffd6eb;";
+galleryContainer.innerHTML = `
+  <h3 style="color: #ff477e; font-size: 1.1em; margin: 0 0 12px 0; display: flex; align-items: center; gap: 8px; font-family: inherit;">
+    🖼️ Galería de Arte
+  </h3>
+  <div id="galleryGrid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; max-height: 180px; overflow-y: auto; padding-right: 4px;"></div>
+`;
 
-document.body.appendChild(settingsBtn);
+// Inyectar el botón y la galería de manera ordenada en la barra lateral
+sidebar.appendChild(settingsBtn);
+sidebar.appendChild(galleryContainer);
 
 // 🛠️ Crear Panel Modal de Configuración (Ajustes + Recordatorios)
 const settingsModal = document.createElement("div");
@@ -118,28 +128,14 @@ document.getElementById("setReminderBtn").addEventListener("click", () => {
   reminderItem.innerHTML = `<span>⏳ ${task} (en ${minutes} min)</span>`;
   activeReminders.appendChild(reminderItem);
   
-  // Limpiar inputs
   document.getElementById("reminderTask").value = "";
   document.getElementById("reminderTime").value = "";
   
   setTimeout(() => {
-    // Alerta del navegador cuando venza el temporizador
     alert(`🔔 ¡IsaBot te recuerda!: ${task} 💕`);
     reminderItem.remove();
   }, minutes * 60 * 1000);
 });
-
-// 🍔 Sección de la Galería dentro del Menú Hamburguesa
-const galleryContainer = document.createElement("div");
-galleryContainer.id = "galleryContainer";
-galleryContainer.style.cssText = "margin-top: auto; padding-top: 15px; border-top: 2px dashed #ffd6eb;";
-galleryContainer.innerHTML = `
-  <h3 style="color: #ff477e; font-size: 1.1em; margin: 0 0 12px 0; display: flex; align-items: center; gap: 8px; font-family: inherit;">
-    🖼️ Galería de Arte
-  </h3>
-  <div id="galleryGrid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; max-height: 180px; overflow-y: auto; padding-right: 4px;"></div>
-`;
-sidebar.appendChild(galleryContainer);
 
 // 🔍 Crear dinámicamente el Modal para Ampliar y Descargar Imágenes
 const previewModal = document.createElement("div");
@@ -280,7 +276,6 @@ function updateChat(chat) {
 
 // 📋 FUNCIÓN DE COPIAR CÓDIGO INTELIGENTE AL ESTILO CHATGPT
 function formatAndCopyCode(text, bubbleElement) {
-  // Buscar si el mensaje contiene bloques de código tipo ```codigo```
   const codeRegex = /```([\s\S]*?)```/g;
   if (codeRegex.test(text)) {
     bubbleElement.innerHTML = text.replace(codeRegex, (match, codeContent) => {
@@ -317,7 +312,7 @@ function appendBotMessage(content, isImage = false) {
     img.addEventListener("click", () => openImageModal(content));
     bubble.textContent = "¡Mira lo que pinté para ti! 🎨✨\n"; bubble.appendChild(img);
   } else {
-    formatAndCopyCode(content, bubble); // Aplicar formateador de código
+    formatAndCopyCode(content, bubble);
   }
 
   container.appendChild(avatarContainer); container.appendChild(bubble);
@@ -363,7 +358,7 @@ async function sendMessage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         mensaje: text,
-        personalidad: botPersonality, // 🎭 ENVIAR LA PERSONALIDAD SELECCIONADA AL BACKEND
+        personalidad: botPersonality,
         historial: chat.messages.slice(0, -1).map(m => ({
           role: m.sender === "user" ? "user" : "assistant",
           content: m.type === "imagen" ? "[Imagen]" : m.text
