@@ -328,7 +328,7 @@ function appendBotMessage(content, isImage = false) {
 
 // Inyectar el nuevo diseño de robotsito rosa (Contenedor ampliado a 45px)
   const avatarContainer = document.createElement("div");
-  avatarContainer.style.cssText = "width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;";
+  avatarContainer.style.cssText = "width: 70px; height: 70px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;";
   avatarContainer.innerHTML = KAWAII_ROBOT_SVG;
 
   const bubble = document.createElement("div");
